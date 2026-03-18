@@ -1,7 +1,9 @@
 package br.ufsm.spi.ProSaude.controller;
 
 
+import br.ufsm.spi.ProSaude.dto.LoginResponseDTO;
 import br.ufsm.spi.ProSaude.infra.security.TokenServiceJWT;
+import br.ufsm.spi.ProSaude.model.usuario.Perfil;
 import br.ufsm.spi.ProSaude.model.usuario.Usuario;
 import br.ufsm.spi.ProSaude.model.usuario.UsuarioRepository;
 import jakarta.validation.Valid;
@@ -47,8 +49,10 @@ public class AutenticacaoController {
             User user = (User) at.getPrincipal();
             assert userr.orElse(null) != null;
             String token = this.tokenServiceJWT.gerarToken(userr.orElse(null));
+            String nome = userr.get().getNome();
+            String perfil = userr.get().getPermissao().toString();
 
-            return ResponseEntity.ok().body(new DadosTokenJWT(token));
+            return ResponseEntity.ok(new LoginResponseDTO(token, nome, perfil));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Falha na autenticação: Credenciais inválidas.");

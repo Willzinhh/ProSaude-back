@@ -11,4 +11,6 @@ public interface TurmaRepository extends JpaRepository<Turma, Long> {
     Optional<Turma> findByCodigo(String nomeTurmaNoCSV);
 
     Turma findTurmaById(Long id);
+
+    Turma getTurmaById(Long id);
 }

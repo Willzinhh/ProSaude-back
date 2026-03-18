@@ -17,10 +17,16 @@ public class TurmaService {
     private TurmaRepository repository;
 
     public Turma salvar(Turma turma) {
-        if (turma.getCodigo() != null) {
-            turma.setCodigo(turma.getCodigo().toUpperCase());
+        Turma turma1 = repository.getTurmaById(turma.getId());
+        if ( turma1 == null ) {
+            return repository.save(turma);
         }
-        return repository.save(turma);
+        else {
+            turma1.setCodigo(turma.getCodigo());
+            turma1.setDescricao(turma.getDescricao());
+            turma1.setNome(turma.getNome());
+        }
+        return repository.save(turma1);
     }
 
     public List<Turma> listarTodas() {

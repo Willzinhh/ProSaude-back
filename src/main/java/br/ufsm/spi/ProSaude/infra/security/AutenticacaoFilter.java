@@ -41,6 +41,7 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
 
         if ((requestURI.equals("/ProSaude/login") && requestMethod.equals("POST")) ||
                 (requestURI.equals("/ProSaude/usuario") && requestMethod.equals("POST")) ||
+                (requestURI.equals("/ProSaude/turma") && requestMethod.equals("GET")) ||
                 (requestMethod.equals("OPTIONS"))) {
 
             System.out.println("Bypass: Rota pública ou OPTIONS. Ignorando validação de token.");

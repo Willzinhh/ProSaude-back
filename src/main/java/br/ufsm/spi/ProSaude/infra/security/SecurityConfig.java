@@ -43,7 +43,7 @@ public class SecurityConfig {
                         // Permite criar usuários sem estar logado (para o seu primeiro teste)
                         .requestMatchers(HttpMethod.POST, "/usuario").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/usuario").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/turma").permitAll()
 
 
 
@@ -62,21 +62,13 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        // Permite o frontend Angular
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
-
-        // Permite os métodos padrões (POST, GET, etc.) e o OPTIONS (preflight request)
+        // Libera a origem específica do seu Flutter Web (veja no log do Chrome a porta atual)
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-        // Permite todos os cabeçalhos, crucial para o token "Authorization"
         configuration.setAllowedHeaders(Arrays.asList("*"));
-
-        // Permite o envio de credenciais (se o Angular estiver configurado para isso)
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // Aplica esta configuração a todos os caminhos (/**)
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }

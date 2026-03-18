@@ -21,6 +21,12 @@ public class TurmaController {
         return ResponseEntity.ok(service.salvar(turma));
     }
 
+    @PutMapping
+    public ResponseEntity<Turma> salvar(@RequestBody Turma turma) {
+        // O service já cuida de colocar o código em maiúsculo (T1, T2...)
+        return ResponseEntity.ok(service.salvar(turma));
+    }
+
     @GetMapping
     public ResponseEntity<List<Turma>> listar() {
         return ResponseEntity.ok(service.listarTodas());
@@ -33,7 +39,7 @@ public class TurmaController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public ResponseEntity deletar( @PathVariable long id) {
         this.service.excluir(id);
         return ResponseEntity.noContent().build();

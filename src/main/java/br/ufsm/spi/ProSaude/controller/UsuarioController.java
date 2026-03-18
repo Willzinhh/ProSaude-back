@@ -32,7 +32,7 @@ public class UsuarioController {
         return ResponseEntity.ok(this.usuarioService.listar());
     }
 
-    @DeleteMapping
+    @DeleteMapping("/{id}")
     public ResponseEntity deletar( @PathVariable long id) {
         this.usuarioService.excluir(id);
         return ResponseEntity.noContent().build();
