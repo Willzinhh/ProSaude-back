@@ -27,7 +27,7 @@ public class Usuario {
     private String senha;
 
     @Enumerated(EnumType.STRING)
-    private Perfil permissao; // COORDENADOR, BOLSISTA ou MONITOR
+    private Perfil perfil; // COORDENADOR, BOLSISTA ou MONITOR
 
     public Usuario(Usuario user) {
     }

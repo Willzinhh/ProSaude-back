@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/usuario")
@@ -30,6 +31,12 @@ public class UsuarioController {
     @GetMapping
     public ResponseEntity listar() {
         return ResponseEntity.ok(this.usuarioService.listar());
+    }
+
+    @GetMapping("/equipe")
+    public ResponseEntity<List<Usuario>> getEquipe() {
+        List<Usuario> equipe = usuarioService.listarEquipe();
+        return ResponseEntity.ok(equipe);
     }
 
     @DeleteMapping("/{id}")

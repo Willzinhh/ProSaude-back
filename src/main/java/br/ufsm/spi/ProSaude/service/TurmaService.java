@@ -17,6 +17,7 @@ public class TurmaService {
     private TurmaRepository repository;
 
     public Turma salvar(Turma turma) {
+        System.out.println(turma.getDescricao()+"**********************************");
         Turma turma1 = repository.getTurmaById(turma.getId());
         if ( turma1 == null ) {
             return repository.save(turma);

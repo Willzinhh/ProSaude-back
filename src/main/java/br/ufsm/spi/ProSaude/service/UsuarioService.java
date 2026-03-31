@@ -1,5 +1,6 @@
 package br.ufsm.spi.ProSaude.service;
 
+import br.ufsm.spi.ProSaude.model.usuario.Perfil;
 import br.ufsm.spi.ProSaude.model.usuario.Usuario;
 import br.ufsm.spi.ProSaude.model.usuario.UsuarioRepository;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -30,6 +32,12 @@ public class UsuarioService {
             throw new NoSuchElementException("Usuário não encontrado");
         }
         return users;
+    }
+
+    public List<Usuario> listarEquipe() {
+        // Use o Enum diretamente
+        List<Perfil> perfisEquipe = Arrays.asList(Perfil.BOLSISTA, Perfil.MONITOR);
+        return repository.findByPerfilIn(perfisEquipe);
     }
 
 

@@ -50,7 +50,7 @@ public class AutenticacaoController {
             assert userr.orElse(null) != null;
             String token = this.tokenServiceJWT.gerarToken(userr.orElse(null));
             String nome = userr.get().getNome();
-            String perfil = userr.get().getPermissao().toString();
+            String perfil = userr.get().getPerfil().toString();
 
             return ResponseEntity.ok(new LoginResponseDTO(token, nome, perfil));
         } catch (Exception e) {

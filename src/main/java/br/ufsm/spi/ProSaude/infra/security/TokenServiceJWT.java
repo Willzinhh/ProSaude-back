@@ -23,7 +23,7 @@ public class TokenServiceJWT {
             return JWT.create()
                     .withIssuer("API ProSaude")
                     .withSubject(user.getEmail())
-                    .withClaim("ROLE", String.valueOf(user.getPermissao()))
+                    .withClaim("ROLE", String.valueOf(user.getPerfil()))
                     .withExpiresAt(dataExpiracao())
                     .sign(algorithm);
         } catch (JWTCreationException e) {

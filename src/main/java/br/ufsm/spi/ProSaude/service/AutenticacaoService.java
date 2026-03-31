@@ -23,7 +23,7 @@ public class AutenticacaoService implements UserDetailsService {
         // Adaptamos o seu modelo para o que o Spring Security entende
         return User.withUsername(usuario.getEmail())
                 .password(usuario.getSenha())
-                .roles(String.valueOf(usuario.getPermissao())) // Garante que BOLSISTA e COORDENADOR funcionem
+                .roles(String.valueOf(usuario.getPerfil())) // Garante que BOLSISTA e COORDENADOR funcionem
                 .build();
     }
 }
