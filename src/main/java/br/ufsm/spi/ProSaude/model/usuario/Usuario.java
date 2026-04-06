@@ -1,5 +1,7 @@
 package br.ufsm.spi.ProSaude.model.usuario;
 
+import br.ufsm.spi.ProSaude.model.dadosAluno.DadosAluno;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,8 +31,10 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private Perfil perfil; // COORDENADOR, BOLSISTA ou MONITOR
 
-    public Usuario(Usuario user) {
-    }
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    @JsonManagedReference
+    private DadosAluno dados;
 
 
     // Getters e Setters

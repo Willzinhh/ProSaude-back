@@ -1,8 +1,10 @@
 package br.ufsm.spi.ProSaude.service;
 
+import br.ufsm.spi.ProSaude.dto.turma.TurmaRequestDTO;
 import br.ufsm.spi.ProSaude.model.turma.Turma;
 import br.ufsm.spi.ProSaude.model.turma.TurmaRepository;
 import br.ufsm.spi.ProSaude.model.usuario.Usuario;
+import br.ufsm.spi.ProSaude.model.usuario.UsuarioRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,17 +17,32 @@ import java.util.Optional;
 public class TurmaService {
 
     private TurmaRepository repository;
+    private UsuarioRepository usuarioRepository;
 
-    public Turma salvar(Turma turma) {
-        System.out.println(turma.getDescricao()+"**********************************");
-        Turma turma1 = repository.getTurmaById(turma.getId());
+    public Turma salvar(TurmaRequestDTO dados) {
+        Turma novaTurma = new Turma();
+        novaTurma.setNome(dados.nome());
+        novaTurma.setDescricao(dados.descricao());
+        novaTurma.setHoraInicio(dados.horaInicio());
+        novaTurma.setHoraFim(dados.horaFim());
+        novaTurma.setDiasSemana(dados.diasSemana());
+
+        if (dados.bolsistaResponsavel().getId() != null) {
+            Usuario bolsista = usuarioRepository.findById(dados.bolsistaResponsavel().getId())
+                    .orElseThrow(() -> new RuntimeException("Bolsista não encontrado"));
+            novaTurma.setBolsistaResponsavel(bolsista); // Agora você seta o OBJETO, não o ID
+        }
+        Turma turma1 = repository.getTurmaById(dados.id());
         if ( turma1 == null ) {
-            return repository.save(turma);
+            return repository.save(novaTurma);
         }
         else {
-            turma1.setCodigo(turma.getCodigo());
-            turma1.setDescricao(turma.getDescricao());
-            turma1.setNome(turma.getNome());
+            turma1.setDescricao(novaTurma.getDescricao());
+            turma1.setNome(novaTurma.getNome());
+            turma1.setBolsistaResponsavel(novaTurma.getBolsistaResponsavel());
+            turma1.setHoraInicio(novaTurma.getHoraInicio());
+            turma1.setHoraFim(novaTurma.getHoraFim());
+            turma1.setDiasSemana(novaTurma.getDiasSemana());
         }
         return repository.save(turma1);
     }
@@ -46,5 +63,9 @@ public class TurmaService {
         }
 
         this.repository.deleteById(id);
+    }
+
+    public List<Turma> buscarPorUsuario(int id) {
+        return repository.buscarMinhasTurmas(id);
     }
 }

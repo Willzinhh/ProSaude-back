@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 @Entity
 @Getter
@@ -16,8 +18,6 @@ public class Turma {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String codigo;
-
     private String nome;
 
     private String descricao;
@@ -26,9 +26,21 @@ public class Turma {
     @JoinColumn(name = "bolsista_responsavel_id")
     private Usuario bolsistaResponsavel;
 
-    @ManyToOne
-    @JoinColumn(name = "monitor_id")
-    private Usuario monitor;
+    @Column(name = "hora_inicio", nullable = false)
+    private LocalTime horaInicio;
+
+    @Column(name = "hora_fim", nullable = false)
+    private LocalTime horaFim;
+
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "turma_dias", joinColumns = @JoinColumn(name = "turma_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "dia")
+    private List<DiaSemana> diasSemana;
+
+
+
 }
 
 

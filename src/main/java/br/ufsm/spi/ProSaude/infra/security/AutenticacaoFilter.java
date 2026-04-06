@@ -53,6 +53,7 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
         System.out.println("Token: " + token);
 
         if (token != null) {
+
             try {
 
                 String subject = this.tokenService.getSubject(token);

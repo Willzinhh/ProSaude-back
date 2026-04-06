@@ -1,1 +1,0 @@
-ALTER TABLE usuario RENAME COLUMN permissao TO perfil;

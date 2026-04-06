@@ -1,14 +1,12 @@
 package br.ufsm.spi.ProSaude.controller;
 
 
-import br.ufsm.spi.ProSaude.dto.LoginResponseDTO;
+import br.ufsm.spi.ProSaude.dto.login.LoginResponseDTO;
 import br.ufsm.spi.ProSaude.infra.security.TokenServiceJWT;
-import br.ufsm.spi.ProSaude.model.usuario.Perfil;
 import br.ufsm.spi.ProSaude.model.usuario.Usuario;
 import br.ufsm.spi.ProSaude.model.usuario.UsuarioRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -51,8 +49,9 @@ public class AutenticacaoController {
             String token = this.tokenServiceJWT.gerarToken(userr.orElse(null));
             String nome = userr.get().getNome();
             String perfil = userr.get().getPerfil().toString();
+            Long id = userr.get().getId();
 
-            return ResponseEntity.ok(new LoginResponseDTO(token, nome, perfil));
+            return ResponseEntity.ok(new LoginResponseDTO(token, nome, perfil, id));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Falha na autenticação: Credenciais inválidas.");

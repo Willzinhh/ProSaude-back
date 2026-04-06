@@ -4,42 +4,39 @@ CREATE TABLE usuario (
                          nome VARCHAR(100) NOT NULL,
                          email VARCHAR(100) UNIQUE NOT NULL,
                          senha VARCHAR(255) NOT NULL,
-                         permissao VARCHAR(20) NOT NULL -- 'COORDENADOR' ou 'BOLSISTA'
+                         perfil VARCHAR(20) NOT NULL -- 'COORDENADOR' ou 'BOLSISTA' ou 'ALUNO'
 );
 
--- 2. Tabela de Aluno (Público Externo)
-CREATE TABLE aluno (
-                       id SERIAL PRIMARY KEY,
-                       nome VARCHAR(100) NOT NULL,
-                       telefone VARCHAR(20),
-                       observacaoMedica TEXT
-);
 
 -- 3. Tabela de Turma
 CREATE TABLE turma (
                        id SERIAL PRIMARY KEY,
-                       codigo VARCHAR (200) NOT NULL,
                        nome VARCHAR(100) NOT NULL,
                        descricao TEXT,
                        bolsista_responsavel_id INTEGER REFERENCES usuario(id), -- Corrigido para 'usuario'
-                       monitor_id INTEGER REFERENCES usuario(id)               -- Corrigido para 'usuario'
+                       hora_inicio TIME NOT NULL,
+                       hora_fim TIME NOT NULL
 );
 
-
--- 4. Tabela de Inscrição (Matrícula)
-CREATE TABLE inscricao ( -- Corrigido de 'inscricoe' para 'inscricao'
-                           id SERIAL PRIMARY KEY,
-                           aluno_id INTEGER REFERENCES aluno(id) ON DELETE CASCADE,  -- Corrigido para 'aluno'
-                           turma_id INTEGER REFERENCES turma(id) ON DELETE CASCADE,  -- Corrigido para 'turma'
-                           data_inscricao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE turma_dias (
+                            turma_id INTEGER NOT NULL REFERENCES turma(id) ON DELETE CASCADE,
+                            dia VARCHAR(20) NOT NULL,
+                            PRIMARY KEY (turma_id, dia) -- Garante que não haja o mesmo dia repetido para a mesma turma
+);
+CREATE TABLE dados_aluno (
+                             usuario_id INTEGER PRIMARY KEY REFERENCES usuario(id) ON DELETE CASCADE,
+                             telefone VARCHAR(20),
+                             CPF VARCHAR(14),
+                             observacao_medica TEXT,
+                             data_nascimento DATE
 );
 
--- 5. Tabela de Presença (Registro em tempo real)
+-- 3. Criar a tabela de Presença (Histórico)
 CREATE TABLE presenca (
                           id SERIAL PRIMARY KEY,
-                          aluno_id INTEGER REFERENCES aluno(id),   -- Corrigido para 'aluno'
-                          turma_id INTEGER REFERENCES turma(id),   -- Corrigido para 'turma'
-                          bolsista_id INTEGER REFERENCES usuario(id), -- Corrigido para 'usuario'
+                          aluno_id INTEGER NOT NULL REFERENCES usuario(id),
+                          turma_id INTEGER NOT NULL REFERENCES turma(id),
                           data_hora_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                          presente BOOLEAN DEFAULT FALSE
+                          presente BOOLEAN DEFAULT TRUE
 );
+

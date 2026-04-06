@@ -1,5 +1,6 @@
 package br.ufsm.spi.ProSaude.controller;
 
+import br.ufsm.spi.ProSaude.dto.usuario.UsuarioRequestDTO;
 import br.ufsm.spi.ProSaude.model.usuario.Usuario;
 import br.ufsm.spi.ProSaude.model.usuario.UsuarioRepository;
 import br.ufsm.spi.ProSaude.service.UsuarioService;
@@ -22,9 +23,9 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @PostMapping
-    public ResponseEntity<Usuario> cadastrar(@RequestBody Usuario usuario, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<Usuario> cadastrar(@RequestBody UsuarioRequestDTO usuario, UriComponentsBuilder uriBuilder) {
         Usuario user = this.usuarioService.salvar(usuario);
-        URI uri = uriBuilder.path("/usuario").buildAndExpand(usuario.getId()).toUri();
+        URI uri = uriBuilder.path("/usuario").buildAndExpand(usuario).toUri();
         return ResponseEntity.created(uri).body(user);
     }
 

@@ -1,5 +1,7 @@
 package br.ufsm.spi.ProSaude.service;
 
+import br.ufsm.spi.ProSaude.dto.usuario.UsuarioRequestDTO;
+import br.ufsm.spi.ProSaude.model.dadosAluno.DadosAluno;
 import br.ufsm.spi.ProSaude.model.usuario.Perfil;
 import br.ufsm.spi.ProSaude.model.usuario.Usuario;
 import br.ufsm.spi.ProSaude.model.usuario.UsuarioRepository;
@@ -20,10 +22,31 @@ public class UsuarioService {
 
     private final UsuarioRepository repository;
 
-    public Usuario salvar(Usuario user) {
-        user.setSenha(new BCryptPasswordEncoder().encode(user.getSenha()));
-        this.repository.save(user);
-        return user;
+    public Usuario salvar(UsuarioRequestDTO dto) {
+        // 1. Instancia o Usuário
+        Usuario usuario = new Usuario();
+        usuario.setNome(dto.nome());
+        usuario.setEmail(dto.email());
+        usuario.setSenha(new BCryptPasswordEncoder().encode(dto.senha())); // Lembre-se do BCrypt aqui se tiver segurança
+        usuario.setPerfil(Perfil.valueOf(dto.perfil()));
+
+        // 2. Se for ALUNO e tiver dados, instancia o DadosAluno
+        if ("ALUNO".equals(dto.perfil()) && dto.dados() != null) {
+            DadosAluno dados = new DadosAluno();
+            dados.setTelefone(dto.dados().telefone());
+            dados.setCPF(dto.dados().cpf());
+            dados.setObservacaoMedica(dto.dados().observacaoMedica());
+            dados.setDataNascimento(dto.dados().dataNascimento());
+
+            // VÍNCULO IMPORTANTE:
+            dados.setUsuario(usuario);
+            usuario.setDados(dados);
+        }
+
+        // 3. Salva o usuário. O "cascade = ALL" salvará os dados automaticamente na outra tabela.
+
+        this.repository.save(usuario);
+        return usuario;
     }
 
     public List listar() {
