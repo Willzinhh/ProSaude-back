@@ -50,8 +50,9 @@ public class AutenticacaoController {
             String nome = userr.get().getNome();
             String perfil = userr.get().getPerfil().toString();
             Long id = userr.get().getId();
+            boolean pa = userr.get().getPrimeiroAcesso();
 
-            return ResponseEntity.ok(new LoginResponseDTO(token, nome, perfil, id));
+            return ResponseEntity.ok(new LoginResponseDTO(token, nome, perfil, id, pa));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Falha na autenticação: Credenciais inválidas.");

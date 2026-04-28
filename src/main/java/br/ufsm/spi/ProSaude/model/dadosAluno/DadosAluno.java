@@ -26,6 +26,8 @@ public class DadosAluno {
     private Usuario usuario;
 
     private String telefone;
+
+    @JoinColumn(name = "cpf")
     private String CPF;
     private String observacaoMedica;
     private LocalDate dataNascimento;

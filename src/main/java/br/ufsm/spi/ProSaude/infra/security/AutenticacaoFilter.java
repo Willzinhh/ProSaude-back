@@ -41,6 +41,7 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
 
         if ((requestURI.equals("/ProSaude/login") && requestMethod.equals("POST")) ||
                 (requestURI.equals("/ProSaude/usuario") && requestMethod.equals("POST")) ||
+                (requestURI.equals("/ProSaude/inscricao/autocadastro") && requestMethod.equals("POST")) ||
                 (requestURI.equals("/ProSaude/turma") && requestMethod.equals("GET")) ||
                 (requestMethod.equals("OPTIONS"))) {
 

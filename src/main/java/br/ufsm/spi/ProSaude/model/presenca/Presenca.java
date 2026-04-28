@@ -1,11 +1,9 @@
 package br.ufsm.spi.ProSaude.model.presenca;
 
-import br.ufsm.spi.ProSaude.model.turma.Turma;
-import br.ufsm.spi.ProSaude.model.usuario.Usuario;
+import br.ufsm.spi.ProSaude.model.inscricao.Inscricao; // Importe sua classe de inscrição
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,16 +12,16 @@ import java.time.LocalDateTime;
 public class Presenca {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // ID incremental (1, 2, 3...)
+    private Long id;
 
+    // Em vez de Usuario e Turma separados, apontamos para a Inscricao
+    // que já contém ambos os dados.
     @ManyToOne
-    @JoinColumn(name = "aluno_id")
-    private Usuario aluno; // FK apontando para Usuario
-
-    @ManyToOne
-    @JoinColumn(name = "turma_id")
-    private Turma turma;
+    @JoinColumn(name = "inscricao_id", nullable = false)
+    private Inscricao inscricao;
 
     private LocalDateTime dataHoraRegistro = LocalDateTime.now();
-    private boolean presente;
+
+    @Column(nullable = false)
+    private boolean presente; // true = presente, false = falta
 }

@@ -2,18 +2,15 @@ package br.ufsm.spi.ProSaude.controller;
 
 import br.ufsm.spi.ProSaude.dto.usuario.UsuarioRequestDTO;
 import br.ufsm.spi.ProSaude.model.usuario.Usuario;
-import br.ufsm.spi.ProSaude.model.usuario.UsuarioRepository;
 import br.ufsm.spi.ProSaude.service.UsuarioService;
-import lombok.AllArgsConstructor;
-import org.hibernate.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/usuario")
@@ -27,6 +24,19 @@ public class UsuarioController {
         Usuario user = this.usuarioService.salvar(usuario);
         URI uri = uriBuilder.path("/usuario").buildAndExpand(usuario).toUri();
         return ResponseEntity.created(uri).body(user);
+    }
+
+    @PutMapping
+    public ResponseEntity<Usuario> salvar(@RequestBody UsuarioRequestDTO dados) {
+        return ResponseEntity.ok(usuarioService.salvar(dados));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        String senhaNoJson = body.get("senha"); // O nome aqui deve ser igual ao do Flutter
+        // ... lógica para salvar e mudar primeiroAcesso para false
+        usuarioService.salvarSenha(id, senhaNoJson);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping

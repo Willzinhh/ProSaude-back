@@ -1,16 +1,11 @@
 package br.ufsm.spi.ProSaude.model.inscricao;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import br.ufsm.spi.ProSaude.model.turma.Turma;
+import br.ufsm.spi.ProSaude.model.usuario.Usuario;
+import jakarta.persistence.*;
+import lombok.*;
 import java.time.LocalDate;
-import java.util.Date;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,12 +13,22 @@ import java.util.Date;
 @Setter
 public class Inscricao {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private  Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private  Long aluno_id;
-    private  Long turma_id;
-    private LocalDate data_inscricao;
+    // EM VEZ DE Long usuarioId, USE O OBJETO:
+    @ManyToOne
+    @JoinColumn(name = "aluno_id") // Nome da coluna no banco
+    private Usuario aluno;
 
+    // EM VEZ DE Long turmaId, USE O OBJETO:
+    @ManyToOne
+    @JoinColumn(name = "turma_id") // Nome da coluna no banco
+    private Turma turma;
+
+    private LocalDate dataInscricao;
+    private String status;
+    private String semestre;
 
 }

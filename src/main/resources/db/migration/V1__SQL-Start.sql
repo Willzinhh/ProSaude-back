@@ -4,7 +4,8 @@ CREATE TABLE usuario (
                          nome VARCHAR(100) NOT NULL,
                          email VARCHAR(100) UNIQUE NOT NULL,
                          senha VARCHAR(255) NOT NULL,
-                         perfil VARCHAR(20) NOT NULL -- 'COORDENADOR' ou 'BOLSISTA' ou 'ALUNO'
+                         perfil VARCHAR(20) NOT NULL, -- 'COORDENADOR' ou 'BOLSISTA' ou 'ALUNO'
+                         primeiro_acesso BOOLEAN DEFAULT TRUE
 );
 
 
@@ -31,12 +32,23 @@ CREATE TABLE dados_aluno (
                              data_nascimento DATE
 );
 
+CREATE TABLE inscricao (
+                           id SERIAL PRIMARY KEY,
+                           aluno_id INTEGER NOT NULL,
+                           turma_id INTEGER NOT NULL,
+                           data_inscricao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                           status VARCHAR(20) DEFAULT 'ATIVO', -- Ex: ATIVO, CANCELADO, ESPERA
+                           CONSTRAINT fk_aluno FOREIGN KEY (aluno_id) REFERENCES usuario(id),
+                           CONSTRAINT fk_turma FOREIGN KEY (turma_id) REFERENCES turma(id),
+                           CONSTRAINT unique_inscricao UNIQUE (aluno_id, turma_id) -- Impede inscrição duplicada
+);
+
 -- 3. Criar a tabela de Presença (Histórico)
+
 CREATE TABLE presenca (
                           id SERIAL PRIMARY KEY,
-                          aluno_id INTEGER NOT NULL REFERENCES usuario(id),
-                          turma_id INTEGER NOT NULL REFERENCES turma(id),
+                          inscricao_id INTEGER NOT NULL REFERENCES inscricao(id) ON DELETE CASCADE,
                           data_hora_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                          presente BOOLEAN DEFAULT TRUE
+                          presente BOOLEAN NOT NULL DEFAULT TRUE -- TRUE = Presente, FALSE = Falta
 );
 

@@ -31,6 +31,9 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     private Perfil perfil; // COORDENADOR, BOLSISTA ou MONITOR
 
+    @Column(name = "primeiro_acesso", nullable = false)
+    private Boolean primeiroAcesso = true;
+
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     @JsonManagedReference

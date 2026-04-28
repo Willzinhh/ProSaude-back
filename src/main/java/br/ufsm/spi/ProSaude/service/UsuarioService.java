@@ -49,7 +49,7 @@ public class UsuarioService {
         return usuario;
     }
 
-    public List listar() {
+    public List listar() {  
         List<Usuario> users = repository.findAll();
         if (users.isEmpty()) {
             throw new NoSuchElementException("Usuário não encontrado");
@@ -71,6 +71,13 @@ public class UsuarioService {
         }
 
         this.repository.deleteById(id);
+    }
+
+    public void salvarSenha(Long id, String senhaNoJson) {
+        Usuario u = repository.findUsuarioById(id);
+        u.setSenha(new BCryptPasswordEncoder().encode(senhaNoJson));
+        u.setPrimeiroAcesso(false);
+        repository.save(u);
     }
 //
 //    public DadosUserOutput editar(@Valid DadosUserInput userInput, long owner_id) {

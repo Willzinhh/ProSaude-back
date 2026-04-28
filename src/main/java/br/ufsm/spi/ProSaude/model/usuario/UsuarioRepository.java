@@ -12,4 +12,5 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     Usuario findUsuarioById(long id);
     List<Usuario> findByPerfilIn(List<Perfil> perfil);
+
 }
