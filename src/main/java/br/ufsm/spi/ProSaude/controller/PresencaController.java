@@ -1,7 +1,6 @@
 package br.ufsm.spi.ProSaude.controller;
 
 import br.ufsm.spi.ProSaude.dto.presenca.RegistroPresencaDTO;
-import br.ufsm.spi.ProSaude.service.AlunoService;
 import br.ufsm.spi.ProSaude.service.InscricaoService;
 import br.ufsm.spi.ProSaude.service.PresencaService;
 

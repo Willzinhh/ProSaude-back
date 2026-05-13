@@ -16,6 +16,6 @@ public interface TurmaRepository extends JpaRepository<Turma, Long> {
 
     Turma getTurmaById(Long id);
 
-    @Query("SELECT a FROM Turma a WHERE a.bolsistaResponsavel.id = :id")
+    @Query("SELECT a FROM Turma a WHERE a.bolsista_responsavel.id = :id")
     List<Turma> buscarMinhasTurmas(@Param("id") int idUsuarioLogado);
 }

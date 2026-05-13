@@ -2,8 +2,8 @@ package br.ufsm.spi.ProSaude.service;
 
 import br.ufsm.spi.ProSaude.dto.inscricao.CadastroInscricaoDTO;
 import br.ufsm.spi.ProSaude.dto.inscricao.InscritoDTO;
-import br.ufsm.spi.ProSaude.model.dadosAluno.DadosAluno;
-import br.ufsm.spi.ProSaude.model.dadosAluno.DadosAlunoRepository;
+import br.ufsm.spi.ProSaude.dto.turma.TurmaDTO;
+import br.ufsm.spi.ProSaude.dto.usuario.UsuarioResponseDTO;
 import br.ufsm.spi.ProSaude.model.inscricao.Inscricao;
 import br.ufsm.spi.ProSaude.model.inscricao.InscricaoRepository;
 import br.ufsm.spi.ProSaude.model.turma.Turma;
@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InscricaoService {
@@ -25,8 +26,6 @@ public class InscricaoService {
     private InscricaoRepository inscricaoRepository;
     @Autowired
     private UsuarioRepository usuarioRepository;
-    @Autowired
-    private DadosAlunoRepository dadosAlunoRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -37,35 +36,30 @@ public class InscricaoService {
     @Transactional
     public void processarInscricaoEAutoCadastro(CadastroInscricaoDTO dto) {
         System.out.print("service inscriço" + dto.getContatoEmergencia());
-        DadosAluno dadosExistentes;
+        Usuario dadosExistentes;
 
-        dadosExistentes = dadosAlunoRepository.findByCPF(dto.getCpf());
+        dadosExistentes = usuarioRepository.findByCPF(dto.getCpf());
 
         Usuario usuario;
 
         if (dadosExistentes != null) {
-            System.out.printf("0----------------------");
+            System.out.printf("Dados Encontrados");
             // Se o CPF já existe, apenas pegamos o usuário vinculado a esses dados
-            usuario = dadosExistentes.getUsuario();
+            usuario = dadosExistentes;
         } else {
-            System.out.printf("1------------------");
+            System.out.printf("Cadastrando Usuario");
             // 2. Se NÃO existe, criamos o Usuario novo
             usuario = new Usuario();
             usuario.setNome(dto.getNome());
             usuario.setEmail(dto.getEmail());
             usuario.setPerfil(Perfil.ALUNO);
             usuario.setSenha(passwordEncoder.encode(dto.getCpf().replaceAll("\\D", "")));
+            usuario.setCPF(dto.getCpf());
+            usuario.setTelefone(dto.getTelefone());
+            usuario.setTelefoneEmergencia(dto.getContatoEmergencia());
+            usuario.setObservacaoMedica(dto.getDoencasCronicas());
+            usuario.setDataNascimento(LocalDate.parse(dto.getDataNascimento()));
 
-            // 3. Criamos o objeto DadosAluno
-            DadosAluno dados = new DadosAluno();
-            dados.setCPF(dto.getCpf());
-            dados.setTelefone(dto.getTelefone());
-            dados.setObservacaoMedica(dto.getDoencasCronicas());
-            dados.setDataNascimento(LocalDate.parse(dto.getDataNascimento()));
-
-            // Fazemos o vínculo bidirecional para o Cascade funcionar
-            dados.setUsuario(usuario);
-            usuario.setDados(dados);
 
             // Salva o usuário (e os dados por cascata)
             usuario = usuarioRepository.save(usuario);
@@ -100,9 +94,24 @@ public class InscricaoService {
 //    }
 
     public List<InscritoDTO> listarAlunosPorTurma(Long turmaId) {
-        // 2. Chama o método usando a variável 'inscricaoRepository' (L minúsculo)
-        // Isso é o "contexto de instância", que o Java exige.
-        return inscricaoRepository.findInscritosByTurma(turmaId);
+        List<Inscricao> inscricoes = inscricaoRepository.findInscricoesByTurma(turmaId);
+
+
+        return inscricoes.stream()
+                .map(inscricao -> new InscritoDTO(
+                        inscricao.getAluno().getNome(),
+                        inscricao.getAluno().getTelefone(),
+                        inscricao.getAluno().getTelefoneEmergencia(),
+                        // E este dado pegamos da própria inscricao
+                        inscricao.getDataInscricao()
+                ))
+                .toList();
+    }
+
+    public Turma listarTurmaPorAluno(Long id, String semestre) {
+        Usuario u = usuarioRepository.findUsuarioById(id);
+        Inscricao i = inscricaoRepository.findInscricaoByAlunoAndSemestre(u,semestre);
+        return turmaRepository.findTurmaById(i.getTurma().getId());
     }
 //
 //    public void registrarFalta(Long inscricaoId) {

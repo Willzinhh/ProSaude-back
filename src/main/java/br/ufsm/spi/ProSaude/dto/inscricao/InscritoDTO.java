@@ -14,8 +14,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class InscritoDTO {
     private String nome;
-    private String cpf;
     private String telefone;
+    private String telefoneEmergencia;
     private LocalDate dataInscricao;
-    private Long faltas;
+
 }

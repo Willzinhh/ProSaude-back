@@ -1,6 +1,5 @@
 package br.ufsm.spi.ProSaude.dto.turma;
 
-import br.ufsm.spi.ProSaude.model.turma.DiaSemana;
 import br.ufsm.spi.ProSaude.model.usuario.Usuario;
 
 import java.time.LocalTime;
@@ -10,8 +9,14 @@ public record TurmaRequestDTO(
         Long id,
         String nome,
         String descricao,
-        Usuario bolsistaResponsavel,
+        Usuario bolsista_responsavel,
         LocalTime horaInicio,
         LocalTime horaFim,
-        List<DiaSemana> diasSemana
+        Boolean SEGUNDA,
+        Boolean TERCA,
+        Boolean QUARTA,
+        Boolean QUINTA,
+        Boolean SEXTA,
+        Boolean SABADO,
+        Boolean DOMINGO
 ) {}

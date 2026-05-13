@@ -1,12 +1,14 @@
 package br.ufsm.spi.ProSaude.model.usuario;
 
-import br.ufsm.spi.ProSaude.model.dadosAluno.DadosAluno;
+
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -34,12 +36,17 @@ public class Usuario {
     @Column(name = "primeiro_acesso", nullable = false)
     private Boolean primeiroAcesso = true;
 
-    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
-    @JsonManagedReference
-    private DadosAluno dados;
 
+    private String telefone;
+    @Column(name = "telefone_emergencia")
+    private String telefoneEmergencia;
 
-    // Getters e Setters
+    @JoinColumn(name = "cpf")
+    private String CPF;
+
+    private LocalDate dataNascimento;
+
+    private String observacaoMedica;
+
 }
 

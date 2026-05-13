@@ -21,13 +21,11 @@ public class TurmaController {
     @PostMapping
     public ResponseEntity<Turma> cadastrar(@RequestBody TurmaRequestDTO turma) {
         // O service já cuida de colocar o código em maiúsculo (T1, T2...)
-        System.out.println("Cadastrando Turma" + turma.bolsistaResponsavel().getId());
         return ResponseEntity.ok(service.salvar(turma));
     }
 
     @PutMapping
     public ResponseEntity<Turma> salvar(@RequestBody TurmaRequestDTO turma) {
-        System.out.println("Cadastrando Turma" + turma.bolsistaResponsavel().getId());
         // O service já cuida de colocar o código em maiúsculo (T1, T2...)
         return ResponseEntity.ok(service.salvar(turma));
     }

@@ -23,14 +23,24 @@ public class TurmaService {
         Turma novaTurma = new Turma();
         novaTurma.setNome(dados.nome());
         novaTurma.setDescricao(dados.descricao());
+        novaTurma.setBolsista_responsavel(dados.bolsista_responsavel());
         novaTurma.setHoraInicio(dados.horaInicio());
         novaTurma.setHoraFim(dados.horaFim());
-        novaTurma.setDiasSemana(dados.diasSemana());
+        novaTurma.setSEGUNDA(dados.SEGUNDA());
+        novaTurma.setTERCA(dados.TERCA());
+        novaTurma.setQUARTA(dados.QUARTA());
+        novaTurma.setQUINTA(dados.QUINTA());
+        novaTurma.setSEXTA(dados.SEXTA());
+        novaTurma.setSABADO(dados.SABADO());
+        novaTurma.setDOMINGO(dados.DOMINGO());
 
-        if (dados.bolsistaResponsavel().getId() != null) {
-            Usuario bolsista = usuarioRepository.findById(dados.bolsistaResponsavel().getId())
+
+
+
+        if (dados.bolsista_responsavel().getId() != null) {
+            Usuario bolsista = usuarioRepository.findById(dados.bolsista_responsavel().getId())
                     .orElseThrow(() -> new RuntimeException("Bolsista não encontrado"));
-            novaTurma.setBolsistaResponsavel(bolsista); // Agora você seta o OBJETO, não o ID
+            novaTurma.setBolsista_responsavel(bolsista); // Agora você seta o OBJETO, não o ID
         }
         Turma turma1 = repository.getTurmaById(dados.id());
         if ( turma1 == null ) {
@@ -39,10 +49,16 @@ public class TurmaService {
         else {
             turma1.setDescricao(novaTurma.getDescricao());
             turma1.setNome(novaTurma.getNome());
-            turma1.setBolsistaResponsavel(novaTurma.getBolsistaResponsavel());
+            turma1.setBolsista_responsavel(novaTurma.getBolsista_responsavel());
             turma1.setHoraInicio(novaTurma.getHoraInicio());
             turma1.setHoraFim(novaTurma.getHoraFim());
-            turma1.setDiasSemana(novaTurma.getDiasSemana());
+            turma1.setSEGUNDA(novaTurma.isSEGUNDA());
+            turma1.setTERCA(novaTurma.isTERCA());
+            turma1.setQUARTA(novaTurma.isQUARTA());
+            turma1.setQUINTA(novaTurma.isQUINTA());
+            turma1.setSEXTA(novaTurma.isSEXTA());
+            turma1.setSABADO(novaTurma.isSABADO());
+            turma1.setDOMINGO(novaTurma.isDOMINGO());
         }
         return repository.save(turma1);
     }
@@ -59,7 +75,7 @@ public class TurmaService {
     public void excluir(long id) {
         Turma turma = repository.findTurmaById(id);
         if (turma == null) {
-            throw new NoSuchElementException("Usuário não encontrado");
+            throw new NoSuchElementException("Turma não encontrada");
         }
 
         this.repository.deleteById(id);

@@ -1,7 +1,7 @@
 package br.ufsm.spi.ProSaude.service;
 
 import br.ufsm.spi.ProSaude.dto.usuario.UsuarioRequestDTO;
-import br.ufsm.spi.ProSaude.model.dadosAluno.DadosAluno;
+import br.ufsm.spi.ProSaude.dto.usuario.UsuarioResponseDTO;
 import br.ufsm.spi.ProSaude.model.usuario.Perfil;
 import br.ufsm.spi.ProSaude.model.usuario.Usuario;
 import br.ufsm.spi.ProSaude.model.usuario.UsuarioRepository;
@@ -31,16 +31,14 @@ public class UsuarioService {
         usuario.setPerfil(Perfil.valueOf(dto.perfil()));
 
         // 2. Se for ALUNO e tiver dados, instancia o DadosAluno
-        if ("ALUNO".equals(dto.perfil()) && dto.dados() != null) {
-            DadosAluno dados = new DadosAluno();
-            dados.setTelefone(dto.dados().telefone());
-            dados.setCPF(dto.dados().cpf());
-            dados.setObservacaoMedica(dto.dados().observacaoMedica());
-            dados.setDataNascimento(dto.dados().dataNascimento());
+        if ("ALUNO".equals(dto.perfil()) && dto.perfil() != null) {
+            usuario.setTelefone(dto.telefone());
+            usuario.setTelefoneEmergencia(dto.telefoneEmergencia());
+            usuario.setCPF(dto.cpf());
+            usuario.setDataNascimento(dto.dataNascimento());
+            usuario.setObservacaoMedica(dto.observacaoMedic());
 
-            // VÍNCULO IMPORTANTE:
-            dados.setUsuario(usuario);
-            usuario.setDados(dados);
+
         }
 
         // 3. Salva o usuário. O "cascade = ALL" salvará os dados automaticamente na outra tabela.
@@ -58,9 +56,17 @@ public class UsuarioService {
     }
 
     public List<Usuario> listarEquipe() {
-        // Use o Enum diretamente
         List<Perfil> perfisEquipe = Arrays.asList(Perfil.BOLSISTA, Perfil.MONITOR);
         return repository.findByPerfilIn(perfisEquipe);
+    }
+
+    public List<UsuarioResponseDTO> listarAlunos() {
+        return repository.findAlunoByPerfil("ALUNO");
+    }
+
+    public UsuarioResponseDTO buscar(long id){
+        return repository.findUsuarioDTOById(id);
+
     }
 
 
