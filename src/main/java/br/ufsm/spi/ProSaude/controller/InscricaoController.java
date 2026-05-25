@@ -2,7 +2,6 @@ package br.ufsm.spi.ProSaude.controller;
 
 import br.ufsm.spi.ProSaude.dto.inscricao.CadastroInscricaoDTO;
 import br.ufsm.spi.ProSaude.dto.inscricao.InscritoDTO;
-import br.ufsm.spi.ProSaude.dto.turma.TurmaDTO;
 import br.ufsm.spi.ProSaude.model.turma.Turma;
 import br.ufsm.spi.ProSaude.service.InscricaoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +25,8 @@ public class InscricaoController {
     }
 
     @GetMapping("/{id}/{ano}/{semestre}")
-    public ResponseEntity<List<Turma>> listarPorInscrito(@PathVariable Long id,@PathVariable String ano, @PathVariable String semestre) {
-        System.out.printf("********************************AQIO");
+    public ResponseEntity<List<Turma>> listarPorInscrito(@PathVariable Long id, @PathVariable String ano, @PathVariable String semestre) {
+        System.out.print("********************************AQIO");
         String periodo = ano + "/" + semestre;
         List<Turma> turmas = Collections.singletonList(service.listarTurmaPorAluno(id, periodo));
         return ResponseEntity.ok(turmas);
@@ -35,11 +34,11 @@ public class InscricaoController {
 
     @PostMapping("/autocadastro")
     public ResponseEntity<?> autoCadastro(@RequestBody CadastroInscricaoDTO dto) {
-        System.out.printf("******************************"+dto.getEmail());
+        System.out.printf("******************************" + dto.getEmail());
         try {
             // Chama o Service que você já configurou para processar a lógica
             service.processarInscricaoEAutoCadastro(dto);
-            System.out.printf("OQ TA DANDOOOOOO");
+            System.out.print("OQ TA DANDOOOOOO");
 
             // Retorna sucesso (201 Created ou 200 OK)
             return ResponseEntity.status(HttpStatus.CREATED)

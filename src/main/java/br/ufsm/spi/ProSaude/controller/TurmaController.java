@@ -2,12 +2,9 @@ package br.ufsm.spi.ProSaude.controller;
 
 import br.ufsm.spi.ProSaude.dto.turma.TurmaRequestDTO;
 import br.ufsm.spi.ProSaude.model.turma.Turma;
-import br.ufsm.spi.ProSaude.model.turma.TurmaRepository;
-import br.ufsm.spi.ProSaude.model.usuario.Usuario;
 import br.ufsm.spi.ProSaude.service.TurmaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -50,7 +47,7 @@ public class TurmaController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity deletar( @PathVariable long id) {
+    public ResponseEntity deletar(@PathVariable long id) {
         this.service.excluir(id);
         return ResponseEntity.noContent().build();
     }

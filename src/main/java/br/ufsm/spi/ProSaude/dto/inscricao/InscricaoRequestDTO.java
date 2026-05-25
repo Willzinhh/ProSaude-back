@@ -8,7 +8,7 @@ public record InscricaoRequestDTO(
         String contatoEmergencia,
         String possuiDoencaQual,
         String dataNacimento
-        
+
 ) {
 
 }

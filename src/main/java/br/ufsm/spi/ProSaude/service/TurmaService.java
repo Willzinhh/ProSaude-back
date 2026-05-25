@@ -35,18 +35,15 @@ public class TurmaService {
         novaTurma.setDOMINGO(dados.DOMINGO());
 
 
-
-
         if (dados.bolsista_responsavel().getId() != null) {
             Usuario bolsista = usuarioRepository.findById(dados.bolsista_responsavel().getId())
                     .orElseThrow(() -> new RuntimeException("Bolsista não encontrado"));
             novaTurma.setBolsista_responsavel(bolsista); // Agora você seta o OBJETO, não o ID
         }
         Turma turma1 = repository.getTurmaById(dados.id());
-        if ( turma1 == null ) {
+        if (turma1 == null) {
             return repository.save(novaTurma);
-        }
-        else {
+        } else {
             turma1.setDescricao(novaTurma.getDescricao());
             turma1.setNome(novaTurma.getNome());
             turma1.setBolsista_responsavel(novaTurma.getBolsista_responsavel());

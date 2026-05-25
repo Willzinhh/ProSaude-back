@@ -6,9 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+
 @Entity
 @Getter
 @Setter
@@ -41,9 +39,6 @@ public class Turma {
     private boolean SEXTA;
     private boolean SABADO;
     private boolean DOMINGO;
-
-
-
 
 
 }

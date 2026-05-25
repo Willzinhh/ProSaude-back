@@ -28,8 +28,7 @@ public class GlobalExceptionHandler {
         Throwable rootCause = ex.getRootCause();
         String detailedMessage = "Erro de integridade de dados.";
 
-        if (rootCause instanceof SQLException) {
-            SQLException sqlEx = (SQLException) rootCause;
+        if (rootCause instanceof SQLException sqlEx) {
             String message = sqlEx.getMessage();
 
             // Tenta analisar a mensagem de erro específica do PostgreSQL
@@ -60,5 +59,6 @@ public class GlobalExceptionHandler {
     }
 
     // DTO de erro (use o mesmo que você definiu para os erros de segurança)
-    private record ErroResponse(int status, String message) {}
+    private record ErroResponse(int status, String message) {
+    }
 }

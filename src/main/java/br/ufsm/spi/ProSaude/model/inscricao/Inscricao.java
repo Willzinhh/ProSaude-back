@@ -3,7 +3,11 @@ package br.ufsm.spi.ProSaude.model.inscricao;
 import br.ufsm.spi.ProSaude.model.turma.Turma;
 import br.ufsm.spi.ProSaude.model.usuario.Usuario;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDate;
 
 @Entity

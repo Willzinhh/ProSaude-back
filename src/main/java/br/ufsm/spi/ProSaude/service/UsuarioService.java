@@ -6,8 +6,6 @@ import br.ufsm.spi.ProSaude.model.usuario.Perfil;
 import br.ufsm.spi.ProSaude.model.usuario.Usuario;
 import br.ufsm.spi.ProSaude.model.usuario.UsuarioRepository;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +45,7 @@ public class UsuarioService {
         return usuario;
     }
 
-    public List listar() {  
+    public List listar() {
         List<Usuario> users = repository.findAll();
         if (users.isEmpty()) {
             throw new NoSuchElementException("Usuário não encontrado");
@@ -64,7 +62,7 @@ public class UsuarioService {
         return repository.findAlunoByPerfil("ALUNO");
     }
 
-    public UsuarioResponseDTO buscar(long id){
+    public UsuarioResponseDTO buscar(long id) {
         return repository.findUsuarioDTOById(id);
 
     }
