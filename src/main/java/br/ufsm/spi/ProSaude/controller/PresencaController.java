@@ -25,6 +25,7 @@ public class PresencaController {
         presencaService.processarChamada(chamada);
         return ResponseEntity.ok().build();
     }
+
     @PatchMapping("/{id}/registrar-falta")
     public ResponseEntity<Void> registrarFalta(@PathVariable Long id) {
 //        inscricaoService.registrarFalta(id);

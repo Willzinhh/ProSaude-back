@@ -1,6 +1,5 @@
 package br.ufsm.spi.ProSaude.model.avaliacao;
 
-import br.ufsm.spi.ProSaude.model.avaliacao.Avaliacao;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

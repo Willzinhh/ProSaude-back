@@ -64,8 +64,7 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
                 UserDetails userDetails = this.autenticacaoService.loadUserByUsername(subject);
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            }
-            catch (JWTVerificationException e) {
+            } catch (JWTVerificationException e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");

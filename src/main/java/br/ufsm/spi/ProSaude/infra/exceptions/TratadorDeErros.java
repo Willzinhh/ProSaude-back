@@ -41,8 +41,10 @@ public class TratadorDeErros {
     private record DadosErroValidacao(String campo, String message) {
     }
 
-    private record ErroResponse(int status, String mensagem) {}
+    private record ErroResponse(int status, String mensagem) {
+    }
 
-    private record DadosErroSimples(String campo) {}
+    private record DadosErroSimples(String campo) {
+    }
 
 }

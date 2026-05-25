@@ -34,5 +34,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     }
 
     // Record (DTO) simples para o corpo da resposta de erro
-    private record ErroResponse(int status, String message) {}
+    private record ErroResponse(int status, String message) {
+    }
 }

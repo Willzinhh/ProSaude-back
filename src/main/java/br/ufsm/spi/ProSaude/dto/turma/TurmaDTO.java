@@ -3,8 +3,6 @@ package br.ufsm.spi.ProSaude.dto.turma;
 
 import br.ufsm.spi.ProSaude.model.turma.Turma;
 
-import java.util.List;
-
 public record TurmaDTO(
         Long id,
         String nome,

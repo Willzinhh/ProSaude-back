@@ -4,6 +4,7 @@ import br.ufsm.spi.ProSaude.model.inscricao.Inscricao; // Importe sua classe de 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity

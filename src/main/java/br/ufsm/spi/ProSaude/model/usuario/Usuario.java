@@ -1,7 +1,6 @@
 package br.ufsm.spi.ProSaude.model.usuario;
 
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

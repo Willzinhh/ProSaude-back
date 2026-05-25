@@ -7,4 +7,5 @@ public record DadosAlunoRequestDTO(
         String cpf,
         String observacaoMedica,
         LocalDate dataNascimento
-) {}
+) {
+}

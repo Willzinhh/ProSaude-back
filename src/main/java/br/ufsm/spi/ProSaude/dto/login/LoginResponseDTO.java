@@ -1,11 +1,11 @@
 package br.ufsm.spi.ProSaude.dto.login;
 
 public class LoginResponseDTO {
-    private String token;
-    private String nome;
-    private String perfil; // Ex: "ADMIN", "MONITOR", "BOLSISTA"
-    private long id;
-    private boolean primeiroAcesso;
+    private final String token;
+    private final String nome;
+    private final String perfil; // Ex: "ADMIN", "MONITOR", "BOLSISTA"
+    private final long id;
+    private final boolean primeiroAcesso;
 
     public LoginResponseDTO(String token, String nome, String perfil, Long id, boolean primeiroAcesso) {
         this.token = token;
@@ -16,9 +16,23 @@ public class LoginResponseDTO {
     }
 
     // Getters e Setters (ou use @Data se tiver o Lombok)
-    public String getToken() { return token; }
-    public String getNome() { return nome; }
-    public String getPerfil() { return perfil; }
-    public long getId() { return id; }
-    public boolean getPrimeiroAcesso() {return primeiroAcesso; }
+    public String getToken() {
+        return token;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getPerfil() {
+        return perfil;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public boolean getPrimeiroAcesso() {
+        return primeiroAcesso;
+    }
 }

@@ -2,8 +2,6 @@ package br.ufsm.spi.ProSaude.service;
 
 import br.ufsm.spi.ProSaude.dto.inscricao.CadastroInscricaoDTO;
 import br.ufsm.spi.ProSaude.dto.inscricao.InscritoDTO;
-import br.ufsm.spi.ProSaude.dto.turma.TurmaDTO;
-import br.ufsm.spi.ProSaude.dto.usuario.UsuarioResponseDTO;
 import br.ufsm.spi.ProSaude.model.inscricao.Inscricao;
 import br.ufsm.spi.ProSaude.model.inscricao.InscricaoRepository;
 import br.ufsm.spi.ProSaude.model.turma.Turma;
@@ -18,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class InscricaoService {
@@ -32,7 +29,6 @@ public class InscricaoService {
     private TurmaRepository turmaRepository;
 
 
-
     @Transactional
     public void processarInscricaoEAutoCadastro(CadastroInscricaoDTO dto) {
         System.out.print("service inscriço" + dto.getContatoEmergencia());
@@ -43,11 +39,11 @@ public class InscricaoService {
         Usuario usuario;
 
         if (dadosExistentes != null) {
-            System.out.printf("Dados Encontrados");
+            System.out.print("Dados Encontrados");
             // Se o CPF já existe, apenas pegamos o usuário vinculado a esses dados
             usuario = dadosExistentes;
         } else {
-            System.out.printf("Cadastrando Usuario");
+            System.out.print("Cadastrando Usuario");
             // 2. Se NÃO existe, criamos o Usuario novo
             usuario = new Usuario();
             usuario.setNome(dto.getNome());
@@ -82,7 +78,7 @@ public class InscricaoService {
 
 
         inscricaoRepository.save(inscricao);
-     }
+    }
 
 //
 //    public List<Inscricao> listarInscritosPorTurma(Long turmaId) {
@@ -110,7 +106,7 @@ public class InscricaoService {
 
     public Turma listarTurmaPorAluno(Long id, String semestre) {
         Usuario u = usuarioRepository.findUsuarioById(id);
-        Inscricao i = inscricaoRepository.findInscricaoByAlunoAndSemestre(u,semestre);
+        Inscricao i = inscricaoRepository.findInscricaoByAlunoAndSemestre(u, semestre);
         return turmaRepository.findTurmaById(i.getTurma().getId());
     }
 //
