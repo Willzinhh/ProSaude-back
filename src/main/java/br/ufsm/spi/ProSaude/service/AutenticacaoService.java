@@ -20,10 +20,9 @@ public class AutenticacaoService implements UserDetailsService {
         Usuario usuario = repository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + email));
 
-        // Adaptamos o seu modelo para o que o Spring Security entende
         return User.withUsername(usuario.getEmail())
                 .password(usuario.getSenha())
-                .roles(String.valueOf(usuario.getPerfil())) // Garante que BOLSISTA e COORDENADOR funcionem
+                .roles(String.valueOf(usuario.getPerfil()))
                 .build();
     }
 }

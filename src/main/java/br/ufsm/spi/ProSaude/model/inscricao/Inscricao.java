@@ -21,14 +21,12 @@ public class Inscricao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // EM VEZ DE Long usuarioId, USE O OBJETO:
     @ManyToOne
-    @JoinColumn(name = "aluno_id") // Nome da coluna no banco
+    @JoinColumn(name = "aluno_id")
     private Usuario aluno;
 
-    // EM VEZ DE Long turmaId, USE O OBJETO:
     @ManyToOne
-    @JoinColumn(name = "turma_id") // Nome da coluna no banco
+    @JoinColumn(name = "turma_id")
     private Turma turma;
 
     private LocalDate dataInscricao;

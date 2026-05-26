@@ -24,7 +24,6 @@ public class Avaliacao {
 
     private LocalDate dataAvaliacao;
 
-    // Ligações com o Usuário
     @ManyToOne
     @JoinColumn(name = "aluno_id")
     private Usuario aluno;
@@ -33,9 +32,7 @@ public class Avaliacao {
     @JoinColumn(name = "avaliador_id")
     private Usuario avaliador;
 
-    // ==========================================
-    // ANAMNESE (ANA) - Padronizado em camelCase
-    // ==========================================
+    // ANAMNESE (ANA)
     private String anaProfi;
     private Double anaHsTrab;
     private String anaTurnTrab;
@@ -43,7 +40,7 @@ public class Avaliacao {
     private String anaFumaTempo;
     private boolean anaAlcool;
 
-    @Enumerated(EnumType.STRING) // Garante que salva o texto do Enum no banco
+    @Enumerated(EnumType.STRING)
     private Qualidade anaQualiSono;
 
     private LocalTime anaHsSono;
@@ -56,9 +53,7 @@ public class Avaliacao {
     private String anaCirurgia;
     private String anaProbCardiaco;
 
-    // ==========================================
     // ANTROPOMETRIA (ANT)
-    // ==========================================
     private Double antPeso;
     private Double antAltura;
     private Double antImc;
@@ -68,9 +63,7 @@ public class Avaliacao {
     private Double antRcq;
     private String antRcqClass;
 
-    // ==========================================
     // COMPOSIÇÃO / DORES (COM)
-    // ==========================================
     private Double comEscalaFig;
     private Double comEscalaFigQuer;
     private boolean comDorehj;
@@ -85,9 +78,7 @@ public class Avaliacao {
     @Embedded
     private DadosSono dadosSono;
 
-    // ==========================================
     // POSTURA - VISTA ANTERIOR (Apenas Texto)
-    // ==========================================
     private String posAnteriorCabeca;
     private String posAnteriorOmbros;
     private String posAnteriorCompBracos;
@@ -100,25 +91,20 @@ public class Avaliacao {
     private String posAnteriorJoelhos;
     private String posAnteriorPes;
 
-    // ==========================================
+
     // POSTURA - VISTA PERFIL (PLANO SAGITAL)
-    // ==========================================
     private String posPerfilCabeca;
     private String posPerfilOmbros;
     private String posPerfilMembrosSuperiores;
 
-    // ==========================================
     // COLUNA VERTEBRAL
-    // ==========================================
     private String posColunaCervical;
     private String posColunaDorsal;
     private String posColunaLombar;
     private String posColunaQuadril;
     private String posColunaJoelhos;
 
-    // ==========================================
     // POSTURA - VISTA POSTERIOR (PLANO DORSAL)
-    // ==========================================
     private String posPosteriorEscoliose;
     private String posPosteriorGibosidade;
     private String posPosteriorTendaoAquiles;

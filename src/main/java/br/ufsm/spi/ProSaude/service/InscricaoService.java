@@ -40,11 +40,9 @@ public class InscricaoService {
 
         if (dadosExistentes != null) {
             System.out.print("Dados Encontrados");
-            // Se o CPF já existe, apenas pegamos o usuário vinculado a esses dados
             usuario = dadosExistentes;
         } else {
             System.out.print("Cadastrando Usuario");
-            // 2. Se NÃO existe, criamos o Usuario novo
             usuario = new Usuario();
             usuario.setNome(dto.getNome());
             usuario.setEmail(dto.getEmail());
@@ -56,19 +54,13 @@ public class InscricaoService {
             usuario.setObservacaoMedica(dto.getDoencasCronicas());
             usuario.setDataNascimento(LocalDate.parse(dto.getDataNascimento()));
 
-
-            // Salva o usuário (e os dados por cascata)
             usuario = usuarioRepository.save(usuario);
         }
-
-        // 4. Validação de segurança: Aluno já inscrito neste semestre?
         boolean jaInscrito = inscricaoRepository.existsByAlunoIdAndSemestre(usuario.getId(), dto.getSemestre());
 
         if (jaInscrito) {
             throw new RuntimeException("Este CPF já possui uma inscrição para o semestre " + dto.getSemestre());
         }
-
-        // 5. Criar a Inscrição
         Inscricao inscricao = new Inscricao();
         inscricao.setAluno(usuario);
         inscricao.setTurma(turmaRepository.findById(dto.getTurmaId()).orElseThrow(() -> new RuntimeException("Turma não encontrada")));
@@ -76,29 +68,18 @@ public class InscricaoService {
         inscricao.setDataInscricao(LocalDate.now());
         inscricao.setStatus("ATIVO");
 
-
         inscricaoRepository.save(inscricao);
     }
-
-//
-//    public List<Inscricao> listarInscritosPorTurma(Long turmaId) {
-//        List<Inscricao> insc = inscricaoRepository.findByTurmaIdOrderByDataInscricaoAsc(turmaId);
-//        if (insc.isEmpty()) {
-//            throw new NoSuchElementException("Turma não encontrado");
-//        }
-//        return insc;
-//    }
 
     public List<InscritoDTO> listarAlunosPorTurma(Long turmaId) {
         List<Inscricao> inscricoes = inscricaoRepository.findInscricoesByTurma(turmaId);
 
-
         return inscricoes.stream()
                 .map(inscricao -> new InscritoDTO(
+                        inscricao.getAluno().getId(),
                         inscricao.getAluno().getNome(),
                         inscricao.getAluno().getTelefone(),
                         inscricao.getAluno().getTelefoneEmergencia(),
-                        // E este dado pegamos da própria inscricao
                         inscricao.getDataInscricao()
                 ))
                 .toList();
@@ -109,10 +90,4 @@ public class InscricaoService {
         Inscricao i = inscricaoRepository.findInscricaoByAlunoAndSemestre(u, semestre);
         return turmaRepository.findTurmaById(i.getTurma().getId());
     }
-//
-//    public void registrarFalta(Long inscricaoId) {
-//        Inscricao i = inscricaoRepository.findById(inscricaoId).orElseThrow(() -> new RuntimeException("Inscrição não encontrada com ID: " + inscricaoId));
-//        i.setFaltas(i.getFaltas() + 1);
-//        inscricaoRepository.save(i);
-//    }
 }

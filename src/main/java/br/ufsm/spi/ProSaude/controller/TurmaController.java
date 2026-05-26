@@ -17,13 +17,11 @@ public class TurmaController {
 
     @PostMapping
     public ResponseEntity<Turma> cadastrar(@RequestBody TurmaRequestDTO turma) {
-        // O service já cuida de colocar o código em maiúsculo (T1, T2...)
         return ResponseEntity.ok(service.salvar(turma));
     }
 
     @PutMapping
     public ResponseEntity<Turma> salvar(@RequestBody TurmaRequestDTO turma) {
-        // O service já cuida de colocar o código em maiúsculo (T1, T2...)
         return ResponseEntity.ok(service.salvar(turma));
     }
 
@@ -34,7 +32,6 @@ public class TurmaController {
 
     @GetMapping("/minhas-turmas/{id}")
     public ResponseEntity<List<Turma>> getMinhasAtividades(@PathVariable int id) {
-        // O @AuthenticationPrincipal pega o usuário que está vindo no Token
         List<Turma> turmas = service.buscarPorUsuario(id);
         return ResponseEntity.ok(turmas);
     }

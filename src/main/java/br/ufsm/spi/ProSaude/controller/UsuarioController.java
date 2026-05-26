@@ -29,13 +29,12 @@ public class UsuarioController {
 
     @PutMapping
     public ResponseEntity<Usuario> salvar(@RequestBody UsuarioRequestDTO dados) {
-        return ResponseEntity.ok(usuarioService.salvar(dados));
+        return ResponseEntity.ok(usuarioService.editar(dados));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        String senhaNoJson = body.get("senha"); // O nome aqui deve ser igual ao do Flutter
-        // ... lógica para salvar e mudar primeiroAcesso para false
+        String senhaNoJson = body.get("senha");
         usuarioService.salvarSenha(id, senhaNoJson);
         return ResponseEntity.ok().build();
     }
@@ -59,7 +58,6 @@ public class UsuarioController {
 
     @PostMapping("/autocadastro")
     public ResponseEntity<Usuario> autocadastro(@RequestBody UsuarioRequestDTO dados) {
-        // O service já cuida de colocar o código em maiúsculo (T1, T2...)
         return ResponseEntity.ok(usuarioService.salvar(dados));
     }
 

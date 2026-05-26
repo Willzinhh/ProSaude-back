@@ -11,7 +11,6 @@ import java.util.List;
 @Repository
 public interface InscricaoRepository extends JpaRepository<Inscricao, Long> {
 
-    // O Spring agora vai mapear corretamente: By + UsuarioId + And + Semestre
     boolean existsByAlunoIdAndSemestre(Long alunoId, String semestre);
 
     Inscricao findInscricaoByIdAndSemestre(Long id, String semestre);

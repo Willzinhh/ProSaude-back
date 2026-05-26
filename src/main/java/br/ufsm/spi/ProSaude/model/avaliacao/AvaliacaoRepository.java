@@ -8,6 +8,5 @@ import java.util.List;
 @Repository
 public interface AvaliacaoRepository extends JpaRepository<Avaliacao, Long> {
 
-    // Busca o histórico de avaliações de um aluno específico ordenado pela data mais recente
     List<Avaliacao> findByAlunoIdOrderByDataAvaliacaoDesc(Long alunoId);
 }

@@ -30,7 +30,7 @@ public class Usuario {
     private String senha;
 
     @Enumerated(EnumType.STRING)
-    private Perfil perfil; // COORDENADOR, BOLSISTA ou MONITOR
+    private Perfil perfil;
 
     @Column(name = "primeiro_acesso", nullable = false)
     private Boolean primeiroAcesso = true;

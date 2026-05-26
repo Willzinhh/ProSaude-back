@@ -13,7 +13,7 @@ public class CadastroInscricaoDTO {
     private String telefone;
     private String contatoEmergencia;
     private String doencasCronicas;
-    private String dataNascimento; // Receba como String do Flutter
+    private String dataNascimento;
 
     // Dados da Matrícula
     private Long turmaId;

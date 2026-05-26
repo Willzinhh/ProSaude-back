@@ -13,9 +13,11 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class InscritoDTO {
+    private long id;
     private String nome;
     private String telefone;
     private String telefoneEmergencia;
     private LocalDate dataInscricao;
+
 
 }

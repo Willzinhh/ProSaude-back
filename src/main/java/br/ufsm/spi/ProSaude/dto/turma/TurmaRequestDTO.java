@@ -8,6 +8,7 @@ public record TurmaRequestDTO(
         Long id,
         String nome,
         String descricao,
+        int vagas,
         Usuario bolsista_responsavel,
         LocalTime horaInicio,
         LocalTime horaFim,

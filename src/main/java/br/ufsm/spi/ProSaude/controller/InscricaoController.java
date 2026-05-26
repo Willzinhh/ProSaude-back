@@ -26,7 +26,6 @@ public class InscricaoController {
 
     @GetMapping("/{id}/{ano}/{semestre}")
     public ResponseEntity<List<Turma>> listarPorInscrito(@PathVariable Long id, @PathVariable String ano, @PathVariable String semestre) {
-        System.out.print("********************************AQIO");
         String periodo = ano + "/" + semestre;
         List<Turma> turmas = Collections.singletonList(service.listarTurmaPorAluno(id, periodo));
         return ResponseEntity.ok(turmas);
@@ -34,22 +33,17 @@ public class InscricaoController {
 
     @PostMapping("/autocadastro")
     public ResponseEntity<?> autoCadastro(@RequestBody CadastroInscricaoDTO dto) {
-        System.out.printf("******************************" + dto.getEmail());
         try {
-            // Chama o Service que você já configurou para processar a lógica
             service.processarInscricaoEAutoCadastro(dto);
             System.out.print("OQ TA DANDOOOOOO");
 
-            // Retorna sucesso (201 Created ou 200 OK)
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body("Cadastro e inscrição realizados com sucesso!");
 
         } catch (RuntimeException e) {
-            // Se o Service lançar erro (CPF duplicado, já inscrito, etc), retorna 400
             return ResponseEntity.badRequest().body(e.getMessage());
 
         } catch (Exception e) {
-            // Erro genérico de servidor (500)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Erro interno ao processar a inscrição.");
         }

@@ -23,22 +23,17 @@ public class AvaliacaoService {
 
     @Transactional
     public Avaliacao salvarAvaliacao(Avaliacao avaliacao, Long alunoId, Long avaliadorId) {
-        // 1. Busca o aluno e o avaliador no banco
         Usuario aluno = usuarioRepository.findById(alunoId)
                 .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
         Usuario avaliador = usuarioRepository.findById(avaliadorId)
                 .orElseThrow(() -> new RuntimeException("Avaliador não encontrado"));
 
-        // 2. Vincula-os à avaliação
         avaliacao.setAluno(aluno);
         avaliacao.setAvaliador(avaliador);
 
-        // 3. Define a data atual da avaliação automaticamente se não vier definida
         if (avaliacao.getDataAvaliacao() == null) {
             avaliacao.setDataAvaliacao(LocalDate.now());
         }
-
-        // 4. Salva no banco de dados (o Hibernate cuida do mapa de dores e do embedded do sono)
         return avaliacaoRepository.save(avaliacao);
     }
 
