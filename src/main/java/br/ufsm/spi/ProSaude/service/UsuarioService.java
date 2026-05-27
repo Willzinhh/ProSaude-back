@@ -21,14 +21,12 @@ public class UsuarioService {
     private final UsuarioRepository repository;
 
     public Usuario salvar(UsuarioRequestDTO dto) {
-        // 1. Instancia o Usuário
         Usuario usuario = new Usuario();
         usuario.setNome(dto.nome());
         usuario.setEmail(dto.email());
-        usuario.setSenha(new BCryptPasswordEncoder().encode(dto.senha())); // Lembre-se do BCrypt aqui se tiver segurança
+        usuario.setSenha(new BCryptPasswordEncoder().encode(dto.senha()));
         usuario.setPerfil(Perfil.valueOf(dto.perfil()));
 
-        // 2. Se for ALUNO e tiver dados, instancia o DadosAluno
         if ("ALUNO".equals(dto.perfil()) && dto.perfil() != null) {
             usuario.setTelefone(dto.telefone());
             usuario.setTelefoneEmergencia(dto.telefoneEmergencia());
@@ -38,8 +36,6 @@ public class UsuarioService {
 
 
         }
-
-        // 3. Salva o usuário. O "cascade = ALL" salvará os dados automaticamente na outra tabela.
 
         this.repository.save(usuario);
         return usuario;
