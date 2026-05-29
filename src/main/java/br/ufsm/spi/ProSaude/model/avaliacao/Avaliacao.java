@@ -43,7 +43,7 @@ public class Avaliacao {
     @Enumerated(EnumType.STRING)
     private Qualidade anaQualiSono;
 
-    private LocalTime anaHsSono;
+    private Double anaHsSono;
     private Double anaCoposAguaDia;
 
     @Enumerated(EnumType.STRING)
@@ -111,4 +111,46 @@ public class Avaliacao {
 
     @Column(columnDefinition = "TEXT")
     private String obs;
+
+    /**
+     * Realiza os cálculos de IMC e RCQ com base nos dados fornecidos pelo Flutter
+     * e preenche as variáveis de classificação automaticamente.
+     */
+    public void calcularParametros() {
+        // 1. CÁLCULO E CLASSIFICAÇÃO DO IMC
+        if (this.antPeso != null && this.antAltura != null && this.antAltura > 0) {
+            // Se a altura vier em centímetros (ex: 175.0), converte para metros (1.75)
+            double alturaMetros = this.antAltura > 3 ? this.antAltura / 100 : this.antAltura;
+
+            this.antImc = this.antPeso / (alturaMetros * alturaMetros);
+
+            if (this.antImc < 18.5) this.antImcClass = "Abaixo do peso";
+            else if (this.antImc < 25) this.antImcClass = "Peso normal";
+            else if (this.antImc < 30) this.antImcClass = "Sobrepeso";
+            else if (this.antImc < 35) this.antImcClass = "Obesidade Grau I";
+            else if (this.antImc < 40) this.antImcClass = "Obesidade Grau II";
+            else this.antImcClass = "Obesidade Grau III";
+        } else {
+            this.antImc = 0.0;
+            this.antImcClass = "Não calculado";
+        }
+
+        // 2. CÁLCULO E CLASSIFICAÇÃO DO RCQ (Relação Cintura-Quadril)
+        if (this.antPeriCintura != null && this.antPeriQuadril != null && this.antPeriQuadril > 0) {
+            this.antRcq = this.antPeriCintura / this.antPeriQuadril;
+
+            // Classificação baseada no padrão da OMS
+            // Se você futuramente quiser separar por sexo, precisaria checar this.aluno.getSexo()
+            if (this.antRcq >= 1.0) {
+                this.antRcqClass = "Risco Alto / Muito Alto";
+            } else if (this.antRcq >= 0.85) {
+                this.antRcqClass = "Risco Moderado";
+            } else {
+                this.antRcqClass = "Risco Baixo";
+            }
+        } else {
+            this.antRcq = 0.0;
+            this.antRcqClass = "Não calculado";
+        }
+    }
 }

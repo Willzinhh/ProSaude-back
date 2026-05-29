@@ -23,10 +23,8 @@ public class AvaliacaoService {
 
     @Transactional
     public Avaliacao salvarAvaliacao(Avaliacao avaliacao, Long alunoId, Long avaliadorId) {
-        Usuario aluno = usuarioRepository.findById(alunoId)
-                .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
-        Usuario avaliador = usuarioRepository.findById(avaliadorId)
-                .orElseThrow(() -> new RuntimeException("Avaliador não encontrado"));
+        Usuario aluno = usuarioRepository.findUsuarioById(alunoId);
+        Usuario avaliador = usuarioRepository.findUsuarioById(avaliadorId);
 
         avaliacao.setAluno(aluno);
         avaliacao.setAvaliador(avaliador);
@@ -34,6 +32,7 @@ public class AvaliacaoService {
         if (avaliacao.getDataAvaliacao() == null) {
             avaliacao.setDataAvaliacao(LocalDate.now());
         }
+        avaliacao.calcularParametros();
         return avaliacaoRepository.save(avaliacao);
     }
 
