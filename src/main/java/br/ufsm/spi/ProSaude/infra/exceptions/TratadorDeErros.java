@@ -1,8 +1,11 @@
 package br.ufsm.spi.ProSaude.infra.exceptions;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,7 +21,7 @@ public class TratadorDeErros {
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity tratarErro404() {
         var erro404 = new DadosErroSimples("Recurso não Encontrado");
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro404);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -38,6 +41,26 @@ public class TratadorDeErros {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(erro403);
     }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<?> tratarErroAutenticacao() {
+        var erroAuth = new DadosErroSimples("Usuário ou senha inválidos.");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(erroAuth);
+    }
+
+    // Caso o seu service lance alguma outra exceção geral de segurança no login
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<?> tratarErroGeralAutenticacao(AuthenticationException ex) {
+        var erroAuth = new DadosErroSimples("Falha na autenticação: " + ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(erroAuth);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<?> tratarErroChaveEstrangeira(DataIntegrityViolationException ex) {
+        // Criamos uma mensagem amigável explicando o motivo real do erro
+        var erroSimples = new DadosErroSimples("Não é possível excluir esta turma porque existem alunos inscritos nela.");
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(erroSimples); // Status 409 Conflict
+    }
+
     private record DadosErroValidacao(String campo, String message) {
     }
 
@@ -46,5 +69,7 @@ public class TratadorDeErros {
 
     private record DadosErroSimples(String campo) {
     }
+
+
 
 }

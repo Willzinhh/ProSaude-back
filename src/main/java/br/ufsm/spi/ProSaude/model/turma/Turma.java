@@ -1,11 +1,13 @@
 package br.ufsm.spi.ProSaude.model.turma;
 
+import br.ufsm.spi.ProSaude.model.inscricao.Inscricao;
 import br.ufsm.spi.ProSaude.model.usuario.Usuario;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -39,7 +41,6 @@ public class Turma {
     private boolean SEXTA;
     private boolean SABADO;
     private boolean DOMINGO;
-
 
 }
 

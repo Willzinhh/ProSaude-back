@@ -76,6 +76,7 @@ public class TurmaService {
         if (turma == null) {
             throw new NoSuchElementException("Turma não encontrada");
         }
+        turma.setBolsista_responsavel(null);
 
         this.repository.deleteById(id);
     }
