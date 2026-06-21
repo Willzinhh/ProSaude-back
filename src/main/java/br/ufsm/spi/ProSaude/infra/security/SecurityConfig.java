@@ -45,10 +45,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/inscricao/autocadastro").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/turma").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/turma/disponiveis/**").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/usuarios/aluno/**").authenticated()
 
 
                         // Qualquer outra requisição exige login
                         .requestMatchers(HttpMethod.POST, "/aluno/importar").hasAnyRole("ADMIN", "BOLSISTA")
+                        .requestMatchers(HttpMethod.DELETE, "/inscricao/**").hasAnyRole("COORDENADOR")
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(handling -> handling

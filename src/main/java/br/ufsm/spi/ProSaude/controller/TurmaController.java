@@ -25,14 +25,26 @@ public class TurmaController {
         return ResponseEntity.ok(service.salvar(turma));
     }
 
+    @GetMapping("/disponiveis/{semestre}")
+    public ResponseEntity<List<Turma>> listarTurmasDisponiveis(@PathVariable String semestre) {
+        // 🎯 Transforma "2026-2" de volta para "2026/2" para bater com o banco!
+        String semestreFormatado = semestre.replace("-", "/");
+
+        System.out.println("🔎 Buscando turmas no banco para o semestre: " + semestreFormatado);
+
+        List<Turma> turmas = service.listarTurmasPorSemestre(semestreFormatado);
+        return ResponseEntity.ok(turmas);
+    }
+
     @GetMapping
     public ResponseEntity<List<Turma>> listar() {
         return ResponseEntity.ok(service.listarTodas());
     }
 
-    @GetMapping("/minhas-turmas/{id}")
-    public ResponseEntity<List<Turma>> getMinhasAtividades(@PathVariable int id) {
-        List<Turma> turmas = service.buscarPorUsuario(id);
+    @GetMapping("/minhas-turmas/{id}/{semestre}")
+    public ResponseEntity<List<Turma>> getMinhasAtividades(@PathVariable int id, @PathVariable String semestre) {
+        String semestreFormatado = semestre.replace("-", "/");
+        List<Turma> turmas = service.buscarPorUsuario(id, semestreFormatado);
         return ResponseEntity.ok(turmas);
     }
 
@@ -47,5 +59,11 @@ public class TurmaController {
     public ResponseEntity deletar(@PathVariable long id) {
         this.service.excluir(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/historico/{id}")
+    public ResponseEntity<List<Turma>> getHistoricoBolsista(@PathVariable int id) {
+        List<Turma> turmas = service.buscarPorBolsista(id);
+        return ResponseEntity.ok(turmas);
     }
 }

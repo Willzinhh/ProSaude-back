@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class CadastroInscricaoDTO {
     // Dados do Usuário
+
     private String nome;
     private String email;
     private String cpf;
@@ -16,6 +17,7 @@ public class CadastroInscricaoDTO {
     private String dataNascimento;
 
     // Dados da Matrícula
+    private Long alunoId;
     private Long turmaId;
     private String semestre;
 }

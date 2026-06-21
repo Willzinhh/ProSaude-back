@@ -24,6 +24,9 @@ public class Turma {
 
     private Long vagas;
 
+    @Column(nullable = false)
+    private String semestre;
+
     @ManyToOne
     @JoinColumn(name = "bolsista_responsavel_id")
     private Usuario bolsista_responsavel;

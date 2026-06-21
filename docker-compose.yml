@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  # 1. Serviço do Banco de Dados PostgreSQL
+  db_prosaude:
+    image: postgres:15-alpine
+    container_name: db_prosaude
+    environment:
+      POSTGRES_DB: prosaude_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - prosaude-network
+
+  # 2. Serviço da API Spring Boot
+  api_prosaude:
+    build:
+      context: .
+    container_name: api_prosaude
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db_prosaude
+    networks:
+      - prosaude-network
+
+volumes:
+  postgres_data:
+
+networks:
+  prosaude-network:
+    driver: bridge

@@ -6,12 +6,15 @@ import br.ufsm.spi.ProSaude.model.usuario.Perfil;
 import br.ufsm.spi.ProSaude.model.usuario.Usuario;
 import br.ufsm.spi.ProSaude.model.usuario.UsuarioRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -58,13 +61,40 @@ public class UsuarioService {
         return repository.findAlunoByPerfil("ALUNO");
     }
 
-    public UsuarioResponseDTO buscar(long id) {
-        return repository.findUsuarioDTOById(id);
+    public Usuario buscar(long id) {
+        // Busca a entidade Usuario direto pelo findById nativo do Spring Data
+        Usuario usuario = repository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Usuário não encontrado com o ID: " + id));
 
+        // Converte manualmente ou via construtor para o seu UsuarioResponseDTO 🎯
+        // Ajuste os parâmetros abaixo de acordo com o construtor exato do seu UsuarioResponseDTO
+        return usuario;
     }
 
 
     public void excluir(long id) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String emailLogado;
+
+        if (principal instanceof UserDetails) {
+            emailLogado = ((UserDetails) principal).getUsername();
+        } else {
+            emailLogado = principal.toString();
+        }
+
+        // 2. Busca o usuário logado para descobrir o ID dele
+        Optional<Usuario> usuarioLogado = repository.findByEmail(emailLogado); // Certifique-se de que tem esse método no seu repository
+
+        if (usuarioLogado == null) {
+            throw new NoSuchElementException("Usuário autenticado não foi encontrado no sistema.");
+        }
+
+        // 3. 🎯 VALIDAÇÃO CRUCIAL: Se o ID para exclusão for igual ao ID do logado, joga uma exceção
+        if (usuarioLogado.get().getId() == id) {
+            throw new IllegalArgumentException("Operação inválida: Você não pode excluir o seu próprio usuário.");
+        }
+
+        // 4. Se passou pela validação, o fluxo antigo segue normalmente
         Usuario user = repository.findUsuarioById(id);
         if (user == null) {
             throw new NoSuchElementException("Usuário não encontrado");

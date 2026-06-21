@@ -12,6 +12,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/usuario")
@@ -66,9 +67,23 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.listarAlunos());
     }
 
+    @GetMapping("/usuarios/aluno/{id}") // Garanta que a URL bata com o seu Flutter
+    public ResponseEntity<?> buscar(@PathVariable Long id) {
+        try {
+            Usuario dto = usuarioService.buscar(id);
+            return ResponseEntity.ok(dto); // Retorna o objeto DTO direto {} e não uma lista []
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            // Se der qualquer outro erro, você verá no terminal do Docker em vez de tomar um 403 às cegas!
+            System.out.println("❌ ERRO NO CONTROLLER: " + e.getMessage());
+            return ResponseEntity.status(500).body("Erro interno: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<UsuarioResponseDTO> buscarPorId(@PathVariable Long id) {
-        UsuarioResponseDTO dto = usuarioService.buscar(id);
+    public ResponseEntity<Usuario> buscarPorId(@PathVariable Long id) {
+        Usuario dto = usuarioService.buscar(id);
         return ResponseEntity.ok(dto);
     }
 

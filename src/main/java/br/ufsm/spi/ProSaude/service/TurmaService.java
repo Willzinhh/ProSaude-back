@@ -24,6 +24,7 @@ public class TurmaService {
         novaTurma.setNome(dados.nome());
         novaTurma.setDescricao(dados.descricao());
         novaTurma.setVagas((long) dados.vagas());
+        novaTurma.setSemestre(dados.semestre());
         novaTurma.setBolsista_responsavel(dados.bolsista_responsavel());
         novaTurma.setHoraInicio(dados.horaInicio());
         novaTurma.setHoraFim(dados.horaFim());
@@ -48,6 +49,7 @@ public class TurmaService {
             turma1.setDescricao(novaTurma.getDescricao());
             turma1.setNome(novaTurma.getNome());
             turma1.setVagas(novaTurma.getVagas());
+            turma1.setSemestre(novaTurma.getSemestre());
             turma1.setBolsista_responsavel(novaTurma.getBolsista_responsavel());
             turma1.setHoraInicio(novaTurma.getHoraInicio());
             turma1.setHoraFim(novaTurma.getHoraFim());
@@ -67,6 +69,7 @@ public class TurmaService {
     }
 
 
+
     public Optional<Turma> buscarPorId(Long id) {
         return repository.findById(id);
     }
@@ -81,7 +84,15 @@ public class TurmaService {
         this.repository.deleteById(id);
     }
 
-    public List<Turma> buscarPorUsuario(int id) {
+    public List<Turma> buscarPorUsuario(int id, String semestreFormatado) {
+        return repository.buscarMinhasTurmasbySemestre(id, semestreFormatado);
+    }
+
+    public List<Turma> listarTurmasPorSemestre(String semestreFormatado) {
+        return repository.findBySemestre(semestreFormatado);
+    }
+
+    public List<Turma> buscarPorBolsista(int id) {
         return repository.buscarMinhasTurmas(id);
     }
 }
