@@ -30,4 +30,16 @@ public interface InscricaoRepository extends JpaRepository<Inscricao, Long> {
     List<Inscricao> findInscricoesByTurmaIdAndSemestre(Long turmaId, String semestreAtual);
 
     Inscricao findInscricoesByAlunoAndTurma(Usuario aluno, Turma turma);
+
+    boolean existsByAlunoIdAndSemestreAndStatus(Long aluno_id, String semestre, StatusInscricao status);
+
+    long countByTurmaIdAndSemestreAndStatus(Long turma_id, String semestre, StatusInscricao status);
+
+    Optional<Inscricao> findFirstByTurmaIdAndSemestreAndStatusOrderByDataInscricaoAsc(Long turma_id, String semestre, StatusInscricao status);
+
+    // Conta o número de inscrições de uma turma filtrado pelo status
+    long countByTurmaIdAndStatus(Long turmaId, StatusInscricao status);
+
+    // Busca as inscrições de uma turma pelo status ordenando pelo ID (ordem de inserção/chegada)
+    List<Inscricao> findByTurmaIdAndStatusOrderByIdAsc(Long turmaId, StatusInscricao status);
 }

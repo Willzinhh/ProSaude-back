@@ -16,6 +16,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class TurmaService {
 
+    private final InscricaoService inscricaoService;
     private TurmaRepository repository;
     private UsuarioRepository usuarioRepository;
 
@@ -61,7 +62,10 @@ public class TurmaService {
             turma1.setSABADO(novaTurma.isSABADO());
             turma1.setDOMINGO(novaTurma.isDOMINGO());
         }
-        return repository.save(turma1);
+        repository.save(turma1);
+        inscricaoService.reavaliarFilaDeEspera(turma1.getId());
+
+        return turma1;
     }
 
     public List<Turma> listarTodas() {

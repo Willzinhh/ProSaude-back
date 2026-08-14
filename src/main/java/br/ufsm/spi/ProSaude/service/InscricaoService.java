@@ -5,11 +5,13 @@ import br.ufsm.spi.ProSaude.dto.inscricao.InscritoDTO;
 import br.ufsm.spi.ProSaude.dto.turma.HistoricoTurmaDTO;
 import br.ufsm.spi.ProSaude.model.inscricao.Inscricao;
 import br.ufsm.spi.ProSaude.model.inscricao.InscricaoRepository;
+import br.ufsm.spi.ProSaude.model.inscricao.StatusInscricao;
 import br.ufsm.spi.ProSaude.model.turma.Turma;
 import br.ufsm.spi.ProSaude.model.turma.TurmaRepository;
 import br.ufsm.spi.ProSaude.model.usuario.Perfil;
 import br.ufsm.spi.ProSaude.model.usuario.Usuario;
 import br.ufsm.spi.ProSaude.model.usuario.UsuarioRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +24,7 @@ import java.util.Optional;
 
 @Service
 public class InscricaoService {
+
     @Autowired
     private InscricaoRepository inscricaoRepository;
     @Autowired
@@ -33,18 +36,15 @@ public class InscricaoService {
 
     @Transactional
     public void processarInscricaoEAutoCadastro(CadastroInscricaoDTO dto) {
-        System.out.println("Service Inscrição - Semestre: " + dto.getSemestre());
         Usuario usuario = null;
 
         if (dto.getAlunoId() != null) {
             usuario = usuarioRepository.findById(dto.getAlunoId()).orElse(null);
-        }
-        else if (dto.getCpf() != null && !dto.getCpf().isEmpty()) {
+        } else if (dto.getCpf() != null && !dto.getCpf().isEmpty()) {
             usuario = usuarioRepository.findByCPF(dto.getCpf());
         }
 
         if (usuario == null) {
-            System.out.println("Cadastrando Novo Usuário Aluno...");
             usuario = new Usuario();
             usuario.setNome(dto.getNome());
             usuario.setEmail(dto.getEmail());
@@ -57,25 +57,79 @@ public class InscricaoService {
             usuario.setDataNascimento(LocalDate.parse(dto.getDataNascimento()));
 
             usuario = usuarioRepository.save(usuario);
-        } else {
-            System.out.println("Usuário existente encontrado: " + usuario.getNome() + ". Reaproveitando dados históricos.");
         }
 
-        boolean jaInscrito = inscricaoRepository.existsByAlunoIdAndSemestre(usuario.getId(), dto.getSemestre());
+        // 🎯 AJUSTE 1: Bloqueia APENAS se o aluno já possui VAGA GARANTIDA em qualquer turma no mesmo semestre
+        boolean jaPossuiVagaGarantida = inscricaoRepository
+                .existsByAlunoIdAndSemestreAndStatus(
+                        usuario.getId(),
+                        dto.getSemestre(),
+                        StatusInscricao.VAGA_GARANTIDA
+                );
 
-        if (jaInscrito) {
-            throw new IllegalArgumentException("Inscrição Negada: Você já possui uma inscrição ativa nesta ou em outra modalidade para o semestre " + dto.getSemestre());
+        if (jaPossuiVagaGarantida) {
+            throw new IllegalArgumentException("Inscrição Negada: Você já possui uma vaga garantida em uma turma para o semestre " + dto.getSemestre());
         }
+
+        Turma turma = turmaRepository.findById(dto.getTurmaId())
+                .orElseThrow(() -> new RuntimeException("Turma não encontrada"));
+
+        // 🎯 AJUSTE 2: Verifica quantas vagas garantidas já foram ocupadas nessa turma
+        long matriculadosComVaga = inscricaoRepository
+                .countByTurmaIdAndSemestreAndStatus(
+                        turma.getId(),
+                        dto.getSemestre(),
+                        StatusInscricao.VAGA_GARANTIDA
+                );
 
         Inscricao inscricao = new Inscricao();
         inscricao.setAluno(usuario);
-        inscricao.setTurma(turmaRepository.findById(dto.getTurmaId())
-                .orElseThrow(() -> new RuntimeException("Turma não encontrada")));
+        inscricao.setTurma(turma);
         inscricao.setSemestre(dto.getSemestre());
         inscricao.setDataInscricao(LocalDate.now());
-        inscricao.setStatus("ATIVO");
+
+// 🎯 3. Atribui o Enum no status
+        if (matriculadosComVaga < turma.getVagas()) {
+            inscricao.setStatus(StatusInscricao.VAGA_GARANTIDA);
+        } else {
+            inscricao.setStatus(StatusInscricao.FILA_DE_ESPERA);
+        }
 
         inscricaoRepository.save(inscricao);
+    }
+
+    @Transactional
+    public void deletar(Long turmaId, Long alunoId) {
+        Usuario usuario = usuarioRepository.findById(alunoId)
+                .orElseThrow(() -> new NoSuchElementException("Aluno não encontrado com o ID: " + alunoId));
+
+        Turma turma = turmaRepository.findById(turmaId)
+                .orElseThrow(() -> new NoSuchElementException("Turma não encontrada com o ID: " + turmaId));
+
+        Inscricao inscricaoRemovida = inscricaoRepository.findInscricoesByAlunoAndTurma(usuario, turma);
+
+        if (inscricaoRemovida == null) {
+            throw new NoSuchElementException("Inscrição não encontrada para este aluno nesta turma");
+        }
+
+        String statusAnterior = String.valueOf(inscricaoRemovida.getStatus());
+        String semestre = inscricaoRemovida.getSemestre();
+
+        // Deleta a inscrição solicitada
+        this.inscricaoRepository.deleteById(inscricaoRemovida.getId());
+
+        // 🎯 AJUSTE 3: Auto-promoção da fila de espera
+        // Se a vaga libertada era GARANTIDA, busca o primeiro da Fila de Espera por ordem de data de inscrição e promove
+        if ("VAGA_GARANTIDA".equals(statusAnterior)) {
+            Optional<Inscricao> proximoDaFila = inscricaoRepository
+                    .findFirstByTurmaIdAndSemestreAndStatusOrderByDataInscricaoAsc(turmaId, semestre, StatusInscricao.valueOf("FILA_DE_ESPERA"));
+
+            if (proximoDaFila.isPresent()) {
+                Inscricao promovido = proximoDaFila.get();
+                promovido.setStatus(StatusInscricao.valueOf("VAGA_GARANTIDA"));
+                inscricaoRepository.save(promovido);
+            }
+        }
     }
 
     public List<InscritoDTO> listarAlunosPorTurma(Long turmaId) {
@@ -94,12 +148,9 @@ public class InscricaoService {
 
     public Turma listarTurmaPorAluno(Long id, String semestre) {
         Usuario u = usuarioRepository.findUsuarioById(id);
-
         List<Inscricao> inscricoes = inscricaoRepository.findInscricoesByAlunoAndSemestre(u, semestre);
 
-        // 🎯 Em vez de lançar RuntimeException e quebrar a tela, retorne null!
         if (inscricoes.isEmpty()) {
-            System.out.println("Aviso: Nenhuma inscrição ativa para o aluno " + id + " no semestre " + semestre);
             return null;
         }
 
@@ -109,23 +160,18 @@ public class InscricaoService {
 
     public List<HistoricoTurmaDTO> listarHistoricoDoAluno(Long alunoId) {
         Usuario u = usuarioRepository.findUsuarioById(alunoId);
-
-        // 1. Busca todas as inscrições dele no banco
         List<Inscricao> historico = inscricaoRepository.findByAluno(u);
 
-        // 2. Calcula dinamicamente o semestre atual do sistema (Ex: "2026/1")
         LocalDate agora = LocalDate.now();
         int anoAtual = agora.getYear();
         String semestreAtual = anoAtual + "/" + (agora.getMonthValue() <= 6 ? "1" : "2");
 
-        // 3. Monta a lista definindo o status baseado no semestre
         return historico.stream()
                 .map(ins -> {
-                    // Se o semestre da inscrição for igual ao atual do sistema, mantém o status original.
-                    // Caso contrário, força a exibição como "INATIVO" ou "CONCLUÍDO".
+                    // 🎯 Converte o Enum para String chamando .name()
                     String statusFinal = ins.getSemestre().equals(semestreAtual)
-                            ? ins.getStatus()
-                            : "INATIVO"; // 🎯 Aqui a mágica acontece
+                            ? ins.getStatus().name()
+                            : "INATIVO";
 
                     return new HistoricoTurmaDTO(
                             ins.getTurma().getId(),
@@ -137,19 +183,49 @@ public class InscricaoService {
                 .toList();
     }
 
+    @Transactional
+    public void reavaliarFilaDeEspera(Long turmaId) {
+        Turma turma = turmaRepository.findById(turmaId)
+                .orElseThrow(() -> new EntityNotFoundException("Turma não encontrada"));
+
+        // 1. Busca todos os alunos garantidos ordenados por ordem de chegada (ID mais antigo primeiro)
+        List<Inscricao> garantidos = inscricaoRepository.findByTurmaIdAndStatusOrderByIdAsc(
+                turmaId, StatusInscricao.VAGA_GARANTIDA);
+
+        int limiteVagas = Math.toIntExact(turma.getVagas());
+
+        // CENÁRIO A: Diminuição de vagas (excedentes vão para a fila)
+        if (garantidos.size() > limiteVagas) {
+            // Pega os excedentes a partir do índice do limite até o final
+            for (int i = limiteVagas; i < garantidos.size(); i++) {
+                Inscricao inscricao = garantidos.get(i);
+                inscricao.setStatus(StatusInscricao.FILA_DE_ESPERA);
+                inscricaoRepository.save(inscricao);
+            }
+        }
+        // CENÁRIO B: Aumento de vagas (promove quem está na fila)
+        else if (garantidos.size() < limiteVagas) {
+            long vagasDisponiveis = limiteVagas - garantidos.size();
+
+            List<Inscricao> filaEspera = inscricaoRepository.findByTurmaIdAndStatusOrderByIdAsc(
+                    turmaId, StatusInscricao.FILA_DE_ESPERA);
+
+            for (int i = 0; i < Math.min(vagasDisponiveis, filaEspera.size()); i++) {
+                Inscricao inscricao = filaEspera.get(i);
+                inscricao.setStatus(StatusInscricao.VAGA_GARANTIDA);
+                inscricaoRepository.save(inscricao);
+            }
+        }
+    }
+
     public List<InscritoDTO> listarAlunosPorTurmaNoSemestreAtual(Long turmaId) {
-        // 1. Calcula dinamicamente o semestre atual do sistema (Ex: "2026/1")
         LocalDate agora = LocalDate.now();
         int anoAtual = agora.getYear();
         String semestreAtual = anoAtual + "/" + (agora.getMonthValue() <= 6 ? "1" : "2");
 
-        System.out.println("Bolsista listando alunos da Turma " + turmaId + " no semestre " + semestreAtual);
-
-        // 2. Busca apenas as inscrições ATIVAS daquela turma NO SEMESTRE ATUAL
         List<Inscricao> inscricoes = inscricaoRepository
                 .findInscricoesByTurmaIdAndSemestre(turmaId, semestreAtual);
 
-        // 3. Converte para DTO
         return inscricoes.stream()
                 .map(inscricao -> new InscritoDTO(
                         inscricao.getAluno().getId(),
@@ -161,22 +237,4 @@ public class InscricaoService {
                 .toList();
     }
 
-    public void deletar(Long turmaId, Long alunoId) {
-        // 1. Busca os objetos e lança erro caso não existam no banco
-        Usuario usuario = usuarioRepository.findById(alunoId)
-                .orElseThrow(() -> new NoSuchElementException("Aluno não encontrado com o ID: " + alunoId));
-
-        Turma turma = turmaRepository.findById(turmaId)
-                .orElseThrow(() -> new NoSuchElementException("Turma não encontrada com o ID: " + turmaId));
-
-        // 2. Agora sim, passa as entidades puras (usuario, turma) extraídas do Optional
-        Inscricao i = inscricaoRepository.findInscricoesByAlunoAndTurma(usuario, turma);
-
-        if (i == null) {
-            throw new NoSuchElementException("Inscrição não encontrada para este aluno nesta turma");
-        }
-
-        // 3. Deleta com sucesso
-        this.inscricaoRepository.deleteById(i.getId());
-    }
 }

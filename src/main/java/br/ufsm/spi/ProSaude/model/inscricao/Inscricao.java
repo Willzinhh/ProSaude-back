@@ -30,7 +30,9 @@ public class Inscricao {
     private Turma turma;
 
     private LocalDate dataInscricao;
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    private StatusInscricao status;
     private String semestre;
 
 }
