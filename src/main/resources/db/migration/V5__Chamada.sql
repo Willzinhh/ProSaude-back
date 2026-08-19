@@ -16,4 +16,4 @@ CREATE TABLE presenca (
     CONSTRAINT fk_presenca_aluno FOREIGN KEY (aluno_id) REFERENCES usuario(id) ON DELETE CASCADE
     );
 
-CREATE INDEX idx_chamada_turma_data ON tb_chamada(turma_id, data);
+CREATE INDEX idx_chamada_turma_data ON chamada(turma_id, data);
