@@ -11,7 +11,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/chamadas")
+@RequestMapping("/chamadas")
 public class ChamadaController {
 
     @Autowired
