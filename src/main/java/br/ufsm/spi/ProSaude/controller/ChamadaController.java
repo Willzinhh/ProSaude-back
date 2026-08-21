@@ -27,6 +27,7 @@ public class ChamadaController {
     // POST /api/chamadas
     @PostMapping
     public ResponseEntity<ChamadaDto> salvar(@RequestBody ChamadaDto dto) {
+        System.out.println(dto.getTurmaId());
         ChamadaDto salva = chamadaService.registrarChamada(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(salva);
     }
