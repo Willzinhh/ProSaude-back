@@ -147,7 +147,7 @@ public class InscricaoService {
     }
 
     public List<InscritoDTO> listarAlunosPorTurma(Long turmaId) {
-        List<Inscricao> inscricoes = inscricaoRepository.findByTurmaIdOrderByDataInscricaoAsc(turmaId);
+        List<Inscricao> inscricoes = inscricaoRepository.findByTurmaIdOrderByDataInscricaoAscIdAsc(turmaId);
 
         return inscricoes.stream()
                 .map(inscricao -> new InscritoDTO(
