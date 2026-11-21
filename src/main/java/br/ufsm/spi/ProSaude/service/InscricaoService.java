@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 public class InscricaoService {
@@ -59,7 +58,7 @@ public class InscricaoService {
             usuario = usuarioRepository.save(usuario);
         }
 
-        // 🎯 AJUSTE 1: Bloqueia APENAS se o aluno já possui VAGA GARANTIDA em qualquer turma no mesmo semestre
+        // Bloqueia se o aluno já possui VAGA GARANTIDA em qualquer turma no mesmo semestre
         boolean jaPossuiVagaGarantida = inscricaoRepository
                 .existsByAlunoIdAndSemestreAndStatus(
                         usuario.getId(),
@@ -74,13 +73,11 @@ public class InscricaoService {
         Turma turma = turmaRepository.findById(dto.getTurmaId())
                 .orElseThrow(() -> new RuntimeException("Turma não encontrada"));
 
-        // 🎯 AJUSTE 2: Verifica quantas vagas garantidas já foram ocupadas nessa turma
-        long matriculadosComVaga = inscricaoRepository
-                .countByTurmaIdAndSemestreAndStatus(
-                        turma.getId(),
-                        dto.getSemestre(),
-                        StatusInscricao.VAGA_GARANTIDA
-                );
+        // Evita inscrição duplicada na mesma turma e semestre
+        Inscricao inscricaoExistente = inscricaoRepository.findInscricoesByAlunoAndTurma(usuario, turma);
+        if (inscricaoExistente != null && inscricaoExistente.getSemestre().equals(dto.getSemestre())) {
+            throw new IllegalArgumentException("Você já está inscrito ou na fila de espera desta turma.");
+        }
 
         Inscricao inscricao = new Inscricao();
         inscricao.setAluno(usuario);
@@ -88,13 +85,46 @@ public class InscricaoService {
         inscricao.setSemestre(dto.getSemestre());
         inscricao.setDataInscricao(LocalDate.now());
 
-// 🎯 3. Atribui o Enum no status
-        if (matriculadosComVaga < turma.getVagas()) {
-            inscricao.setStatus(StatusInscricao.VAGA_GARANTIDA);
-        } else {
-            inscricao.setStatus(StatusInscricao.FILA_DE_ESPERA);
+        // TODOS os alunos entram em FILA_DE_ESPERA aguardando confirmação do bolsista
+        inscricao.setStatus(StatusInscricao.FILA_DE_ESPERA);
+
+        inscricaoRepository.save(inscricao);
+    }
+
+    // NOVO MÉTODO: Bolsista confirma a vaga do aluno que está na fila de espera
+    @Transactional
+    public void confirmarVaga(Long turmaId, Long alunoId) {
+        Usuario aluno = usuarioRepository.findById(alunoId)
+                .orElseThrow(() -> new NoSuchElementException("Aluno não encontrado com o ID: " + alunoId));
+
+        Turma turma = turmaRepository.findById(turmaId)
+                .orElseThrow(() -> new NoSuchElementException("Turma não encontrada com o ID: " + turmaId));
+
+        Inscricao inscricao = inscricaoRepository.findInscricoesByAlunoAndTurma(aluno, turma);
+        if (inscricao == null) {
+            throw new NoSuchElementException("Inscrição não encontrada para este aluno nesta turma.");
         }
 
+        if (inscricao.getStatus() == StatusInscricao.VAGA_GARANTIDA) {
+            throw new IllegalArgumentException("Este aluno já possui vaga confirmada nesta turma.");
+        }
+
+        // Verifica se o aluno já não foi confirmado em OUTRA turma neste mesmo semestre
+        boolean jaPossuiVagaNoSemestre = inscricaoRepository.existsByAlunoIdAndSemestreAndStatus(
+                alunoId, inscricao.getSemestre(), StatusInscricao.VAGA_GARANTIDA);
+        if (jaPossuiVagaNoSemestre) {
+            throw new IllegalArgumentException("Este aluno já possui vaga confirmada em outra turma neste semestre.");
+        }
+
+        // Verifica se ainda há vagas disponíveis na turma
+        long matriculadosComVaga = inscricaoRepository.countByTurmaIdAndSemestreAndStatus(
+                turma.getId(), inscricao.getSemestre(), StatusInscricao.VAGA_GARANTIDA);
+
+        if (matriculadosComVaga >= turma.getVagas()) {
+            throw new IllegalStateException("Não há mais vagas disponíveis nesta turma.");
+        }
+
+        inscricao.setStatus(StatusInscricao.VAGA_GARANTIDA);
         inscricaoRepository.save(inscricao);
     }
 
@@ -112,24 +142,8 @@ public class InscricaoService {
             throw new NoSuchElementException("Inscrição não encontrada para este aluno nesta turma");
         }
 
-        String statusAnterior = String.valueOf(inscricaoRemovida.getStatus());
-        String semestre = inscricaoRemovida.getSemestre();
-
-        // Deleta a inscrição solicitada
+        // Apenas remove a inscrição. A vaga liberada só será preenchida quando o bolsista confirmar outro aluno.
         this.inscricaoRepository.deleteById(inscricaoRemovida.getId());
-
-        // 🎯 AJUSTE 3: Auto-promoção da fila de espera
-        // Se a vaga libertada era GARANTIDA, busca o primeiro da Fila de Espera por ordem de data de inscrição e promove
-        if ("VAGA_GARANTIDA".equals(statusAnterior)) {
-            Optional<Inscricao> proximoDaFila = inscricaoRepository
-                    .findFirstByTurmaIdAndSemestreAndStatusOrderByDataInscricaoAsc(turmaId, semestre, StatusInscricao.valueOf("FILA_DE_ESPERA"));
-
-            if (proximoDaFila.isPresent()) {
-                Inscricao promovido = proximoDaFila.get();
-                promovido.setStatus(StatusInscricao.valueOf("VAGA_GARANTIDA"));
-                inscricaoRepository.save(promovido);
-            }
-        }
     }
 
     public List<InscritoDTO> listarAlunosPorTurma(Long turmaId) {
@@ -141,7 +155,8 @@ public class InscricaoService {
                         inscricao.getAluno().getNome(),
                         inscricao.getAluno().getTelefone(),
                         inscricao.getAluno().getTelefoneEmergencia(),
-                        inscricao.getDataInscricao()
+                        inscricao.getDataInscricao(),
+                        inscricao.getStatus()
                 ))
                 .toList();
     }
@@ -168,7 +183,6 @@ public class InscricaoService {
 
         return historico.stream()
                 .map(ins -> {
-                    // 🎯 Converte o Enum para String chamando .name()
                     String statusFinal = ins.getSemestre().equals(semestreAtual)
                             ? ins.getStatus().name()
                             : "INATIVO";
@@ -188,31 +202,17 @@ public class InscricaoService {
         Turma turma = turmaRepository.findById(turmaId)
                 .orElseThrow(() -> new EntityNotFoundException("Turma não encontrada"));
 
-        // 1. Busca todos os alunos garantidos ordenados por ordem de chegada (ID mais antigo primeiro)
         List<Inscricao> garantidos = inscricaoRepository.findByTurmaIdAndStatusOrderByIdAsc(
                 turmaId, StatusInscricao.VAGA_GARANTIDA);
 
         int limiteVagas = Math.toIntExact(turma.getVagas());
 
-        // CENÁRIO A: Diminuição de vagas (excedentes vão para a fila)
+        // Mantém apenas o rebaixamento caso o número de vagas da turma seja reduzido.
+        // O aumento de vagas não promove automaticamente, pois depende da confirmação do bolsista.
         if (garantidos.size() > limiteVagas) {
-            // Pega os excedentes a partir do índice do limite até o final
             for (int i = limiteVagas; i < garantidos.size(); i++) {
                 Inscricao inscricao = garantidos.get(i);
                 inscricao.setStatus(StatusInscricao.FILA_DE_ESPERA);
-                inscricaoRepository.save(inscricao);
-            }
-        }
-        // CENÁRIO B: Aumento de vagas (promove quem está na fila)
-        else if (garantidos.size() < limiteVagas) {
-            long vagasDisponiveis = limiteVagas - garantidos.size();
-
-            List<Inscricao> filaEspera = inscricaoRepository.findByTurmaIdAndStatusOrderByIdAsc(
-                    turmaId, StatusInscricao.FILA_DE_ESPERA);
-
-            for (int i = 0; i < Math.min(vagasDisponiveis, filaEspera.size()); i++) {
-                Inscricao inscricao = filaEspera.get(i);
-                inscricao.setStatus(StatusInscricao.VAGA_GARANTIDA);
                 inscricaoRepository.save(inscricao);
             }
         }
@@ -232,9 +232,9 @@ public class InscricaoService {
                         inscricao.getAluno().getNome(),
                         inscricao.getAluno().getTelefone(),
                         inscricao.getAluno().getTelefoneEmergencia(),
-                        inscricao.getDataInscricao()
+                        inscricao.getDataInscricao(),
+                        inscricao.getStatus()
                 ))
                 .toList();
     }
-
 }

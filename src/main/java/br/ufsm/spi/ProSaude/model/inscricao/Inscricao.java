@@ -32,7 +32,8 @@ public class Inscricao {
     private LocalDate dataInscricao;
 
     @Enumerated(EnumType.STRING)
-    private StatusInscricao status;
+    @Column(nullable = false)
+    private StatusInscricao status = StatusInscricao.FILA_DE_ESPERA;
     private String semestre;
 
 }

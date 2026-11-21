@@ -26,6 +26,18 @@ public class InscricaoController {
         return ResponseEntity.ok(service.listarAlunosPorTurma(turmaId));
     }
 
+    @PutMapping("/{turmaId}/{alunoId}/confirmar")
+    public ResponseEntity<?> confirmarVaga(@PathVariable Long turmaId, @PathVariable Long alunoId) {
+        try {
+            service.confirmarVaga(turmaId, alunoId);
+            return ResponseEntity.ok(Map.of("mensagem", "Vaga confirmada com sucesso!"));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("mensagem", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("mensagem", "Erro interno ao confirmar vaga."));
+        }
+    }
     @GetMapping("/{id}/{ano}/{semestre}")
     public ResponseEntity<?> listarPorInscrito(@PathVariable Long id, @PathVariable String ano, @PathVariable String semestre) {
         String periodo = ano + "/" + semestre;

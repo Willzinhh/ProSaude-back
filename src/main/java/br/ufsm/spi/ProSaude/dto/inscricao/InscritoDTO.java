@@ -1,12 +1,12 @@
 package br.ufsm.spi.ProSaude.dto.inscricao;
 
+import br.ufsm.spi.ProSaude.model.inscricao.StatusInscricao;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-
 
 @Getter
 @Setter
@@ -18,6 +18,5 @@ public class InscritoDTO {
     private String telefone;
     private String telefoneEmergencia;
     private LocalDate dataInscricao;
-
-
+    private StatusInscricao status;
 }
