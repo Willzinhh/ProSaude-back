@@ -27,6 +27,9 @@ public class Turma {
     @Column(nullable = false)
     private String semestre;
 
+    @Column(name = "possui_ficha_treino", nullable = false)
+    private Boolean possuiFichaTreino = false;
+
     @ManyToOne
     @JoinColumn(name = "bolsista_responsavel_id")
     private Usuario bolsista_responsavel;
