@@ -147,7 +147,7 @@ public class InscricaoService {
     }
 
     public List<InscritoDTO> listarAlunosPorTurma(Long turmaId) {
-        List<Inscricao> inscricoes = inscricaoRepository.findInscricoesByTurma(turmaId);
+        List<Inscricao> inscricoes = inscricaoRepository.findByTurmaIdOrderByDataInscricaoAsc(turmaId);
 
         return inscricoes.stream()
                 .map(inscricao -> new InscritoDTO(
@@ -197,26 +197,7 @@ public class InscricaoService {
                 .toList();
     }
 
-    @Transactional
-    public void reavaliarFilaDeEspera(Long turmaId) {
-        Turma turma = turmaRepository.findById(turmaId)
-                .orElseThrow(() -> new EntityNotFoundException("Turma não encontrada"));
-
-        List<Inscricao> garantidos = inscricaoRepository.findByTurmaIdAndStatusOrderByIdAsc(
-                turmaId, StatusInscricao.VAGA_GARANTIDA);
-
-        int limiteVagas = Math.toIntExact(turma.getVagas());
-
-        // Mantém apenas o rebaixamento caso o número de vagas da turma seja reduzido.
-        // O aumento de vagas não promove automaticamente, pois depende da confirmação do bolsista.
-        if (garantidos.size() > limiteVagas) {
-            for (int i = limiteVagas; i < garantidos.size(); i++) {
-                Inscricao inscricao = garantidos.get(i);
-                inscricao.setStatus(StatusInscricao.FILA_DE_ESPERA);
-                inscricaoRepository.save(inscricao);
-            }
-        }
-    }
+    
 
     public List<InscritoDTO> listarAlunosPorTurmaNoSemestreAtual(Long turmaId) {
         LocalDate agora = LocalDate.now();
