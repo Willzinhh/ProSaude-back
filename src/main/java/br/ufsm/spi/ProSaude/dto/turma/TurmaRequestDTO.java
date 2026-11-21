@@ -10,6 +10,7 @@ public record TurmaRequestDTO(
         String descricao,
         int vagas,
         String semestre,
+        boolean possuiFichaTreino,
         Usuario bolsista_responsavel,
         LocalTime horaInicio,
         LocalTime horaFim,

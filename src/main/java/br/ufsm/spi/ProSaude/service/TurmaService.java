@@ -26,6 +26,7 @@ public class TurmaService {
         novaTurma.setDescricao(dados.descricao());
         novaTurma.setVagas((long) dados.vagas());
         novaTurma.setSemestre(dados.semestre());
+        novaTurma.setPossuiFichaTreino(dados.possuiFichaTreino());
         novaTurma.setBolsista_responsavel(dados.bolsista_responsavel());
         novaTurma.setHoraInicio(dados.horaInicio());
         novaTurma.setHoraFim(dados.horaFim());
@@ -51,6 +52,7 @@ public class TurmaService {
             turma1.setNome(novaTurma.getNome());
             turma1.setVagas(novaTurma.getVagas());
             turma1.setSemestre(novaTurma.getSemestre());
+            turma1.setPossuiFichaTreino(novaTurma.getPossuiFichaTreino());
             turma1.setBolsista_responsavel(novaTurma.getBolsista_responsavel());
             turma1.setHoraInicio(novaTurma.getHoraInicio());
             turma1.setHoraFim(novaTurma.getHoraFim());
@@ -63,7 +65,7 @@ public class TurmaService {
             turma1.setDOMINGO(novaTurma.isDOMINGO());
         }
         repository.save(turma1);
-        
+
 
         return turma1;
     }
