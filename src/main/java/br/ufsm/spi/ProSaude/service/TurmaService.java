@@ -63,7 +63,7 @@ public class TurmaService {
             turma1.setDOMINGO(novaTurma.isDOMINGO());
         }
         repository.save(turma1);
-        inscricaoService.reavaliarFilaDeEspera(turma1.getId());
+        
 
         return turma1;
     }

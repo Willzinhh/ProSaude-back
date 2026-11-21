@@ -197,7 +197,7 @@ public class InscricaoService {
                 .toList();
     }
 
-    
+
 
     public List<InscritoDTO> listarAlunosPorTurmaNoSemestreAtual(Long turmaId) {
         LocalDate agora = LocalDate.now();
